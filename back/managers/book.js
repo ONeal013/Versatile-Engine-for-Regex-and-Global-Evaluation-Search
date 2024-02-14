@@ -1,13 +1,13 @@
 const axios = require('axios');
-const { Book } = require('../config/models/book');
+const Book = require('../config/models/book');
 
 async function fetchAndStoreBooks() {
     try {
       // Récupérer les 10 premiers livres de Guttendex
-      const response = await axios.get('https://www.guttendex.com/books?limit=10');
-      const books = response.data;
+      const response = await axios.get('https://gutendex.com/books?limit=10');
+      const books = response.data.results;
   
-        console.log('Récupération des livres terminée.', books);
+        // console.log('Récupération des livres terminée.', books);
 
       // Parcourir les livres et les stocker dans la base de données MongoDB
       for (const book of books) {
