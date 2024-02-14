@@ -10,7 +10,6 @@ const contentSchema = new mongoose.Schema({
     type: String,
     required: true
   },
-
 });
 
 module.exports = contentSchema;

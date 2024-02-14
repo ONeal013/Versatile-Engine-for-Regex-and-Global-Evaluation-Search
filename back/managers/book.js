@@ -3,7 +3,7 @@ const Book = require('../config/models/book');
 const Author = require('../config/models/author');
 const BookContent = require('../config/models/content');
 const Index = require('../config/models/index');
-const indexor = require('./indexor');
+const tokenize = require('./indexor');
 
 async function fetchAndStoreBooks() {
     try {
@@ -55,10 +55,11 @@ async function fetchAndStoreBooks() {
           await newBookContent.save();
 
         // Indexer le contenu du livre
-        const tokens = indexor(content);
+        const tokens = tokenize(content);
+        console.log('tokens: ', tokens);
         const newIndex = new Index({
           book: newBook._id,
-          tokens: tokens,
+          tokens,
         });
         await newIndex.save(); 
       }

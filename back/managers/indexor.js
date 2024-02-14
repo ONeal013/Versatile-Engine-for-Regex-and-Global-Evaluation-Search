@@ -11,6 +11,7 @@ const tokenize = (data) => {
             index[token]++;
         }
     });
+    return index;
 }
 
 module.exports = tokenize;
