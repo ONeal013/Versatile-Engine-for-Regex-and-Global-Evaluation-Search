@@ -1,5 +1,6 @@
 const axios = require('axios');
 const Book = require('../config/models/book');
+const Author = require('../config/models/author');
 
 async function fetchAndStoreBooks() {
     try {
@@ -11,7 +12,22 @@ async function fetchAndStoreBooks() {
 
       // Parcourir les livres et les stocker dans la base de données MongoDB
       for (const book of books) {
-        const newBook = new Book(book);
+        const authorIds = [];
+        for (const authorData of book.authors) {
+          let author = await Author.findOne({ name: authorData.name }); // Trouver l'auteur par son nom
+          if (!author) {
+            // Si l'auteur n'existe pas, le créer
+            author = new Author(authorData);
+            await author.save();
+          }
+          authorIds.push(author._id); // Ajouter l'ID de l'auteur au tableau
+        }
+
+        // Créer un nouveau livre avec les ID des auteurs
+        const newBook = new Book({
+          ...book,
+          authors: authorIds // Assurez-vous que le schéma de Book peut gérer ce champ
+        });
         await newBook.save();
         console.log(`Livre "${newBook.title}" ajouté à la base de données.`);
       }
