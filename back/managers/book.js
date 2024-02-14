@@ -1,11 +1,12 @@
 const axios = require('axios');
 const Book = require('../config/models/book');
 const Author = require('../config/models/author');
+const BookContent = require('../config/models/content')
 
 async function fetchAndStoreBooks() {
     try {
       // Récupérer les 10 premiers livres de Guttendex
-      const response = await axios.get('https://gutendex.com/books?limit=10');
+      const response = await axios.get('https://gutendex.com/books?ids=84,85,86,87,88,89,90,91,92,93');
       const books = response.data.results;
   
         // console.log('Récupération des livres terminée.', books);
@@ -23,13 +24,33 @@ async function fetchAndStoreBooks() {
           authorIds.push(author._id); // Ajouter l'ID de l'auteur au tableau
         }
 
+        const translatorIds = [];
+        for (const translatorData of book.authors) {
+          let translator = await Author.findOne({ name: translatorData.name }); // Trouver le traducteur par son nom
+          if (!translator) {
+            // Si le traducteur n'existe pas, le créer
+            translator = new Author(translatorData);
+            await translator.save();
+          }
+          translatorIds.push(translator._id); // Ajouter l'ID du traducteur au tableau
+        }
+
         // Créer un nouveau livre avec les ID des auteurs
         const newBook = new Book({
           ...book,
-          authors: authorIds // Assurez-vous que le schéma de Book peut gérer ce champ
+          authors: authorIds,
+          translators: translatorIds,
         });
         await newBook.save();
         console.log(`Livre "${newBook.title}" ajouté à la base de données.`);
+
+        const response = await axios.get(newBook.formats['text/plain; charset=us-ascii'])
+        const newBookContent = new BookContent({
+            book: newBook._id, // ID du livre nouvellement créé
+            content: response.data, // Remplacez par le contenu réel du livre
+          });
+          await newBookContent.save();
+
       }
       console.log('Opération terminée.');
     } catch (error) {
