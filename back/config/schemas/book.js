@@ -4,8 +4,8 @@ const authorSchema = require('./author');
 const bookSchema = new mongoose.Schema({
     id: Number,
     title: String,
-    authors: [authorSchema],
-    translators: [authorSchema],
+    authors: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Author' }],
+    translators: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Author' }],
     subjects: [String],
     bookshelves: [String],
     languages: [String],
