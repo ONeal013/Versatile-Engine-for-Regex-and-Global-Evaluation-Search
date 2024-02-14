@@ -1,7 +1,9 @@
 const axios = require('axios');
 const Book = require('../config/models/book');
 const Author = require('../config/models/author');
-const BookContent = require('../config/models/content')
+const BookContent = require('../config/models/content');
+const Index = require('../config/models/index');
+const indexor = require('./indexor');
 
 async function fetchAndStoreBooks() {
     try {
@@ -52,7 +54,13 @@ async function fetchAndStoreBooks() {
           });
           await newBookContent.save();
 
-          
+        // Indexer le contenu du livre
+        const tokens = indexor(content);
+        const newIndex = new Index({
+          book: newBook._id,
+          tokens: tokens,
+        });
+        await newIndex.save(); 
       }
       console.log('Opération terminée.');
     } catch (error) {

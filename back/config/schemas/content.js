@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 
-const bookContentSchema = new mongoose.Schema({
+const contentSchema = new mongoose.Schema({
   book: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Book',
@@ -13,4 +13,4 @@ const bookContentSchema = new mongoose.Schema({
 
 });
 
-module.exports = bookContentSchema;
+module.exports = contentSchema;
