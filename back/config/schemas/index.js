@@ -1,17 +1,9 @@
 const mongoose = require('mongoose');
 
 const indexSchema = new mongoose.Schema({
-    book: {
-        type: String,
-        ref: 'Book',
-        required: true
-    },
-    // tokens is a map of token to frequency of that token in the book
-    tokens: {
-        type: Map,
-        of: Number,
-        required: true
-    }
+    book: { type: mongoose.Schema.Types.ObjectId, ref: 'Book' },
+    tokens: { type: Map, of: Number }
 });
+
 
 module.exports = indexSchema;

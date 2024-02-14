@@ -5,69 +5,71 @@ const BookContent = require('../config/models/content');
 const Index = require('../config/models/index');
 const tokenize = require('./indexor');
 
+function cleanKeys(tokens) {
+  const cleanedTokens = {};
+  Object.keys(tokens).forEach(key => {
+      if (key !== 'prototype' && !key.startsWith('__')) { // Vérifier contre les noms réservés
+          cleanedTokens[key] = tokens[key];
+      }
+  });
+  return cleanedTokens;
+}
+
+
 async function fetchAndStoreBooks() {
     try {
-      // Récupérer les 10 premiers livres de Guttendex
-      const response = await axios.get('https://gutendex.com/books?ids=84,85,86,87,88,89,90,91,92,93');
-      const books = response.data.results;
-  
-        // console.log('Récupération des livres terminée.', books);
+        // Récupérer les 10 premiers livres de Gutenberg
+        const response = await axios.get('https://gutendex.com/books?ids=84,85,86,87,88,89,90,91,92,93');
+        const books = response.data.results;
 
-      // Parcourir les livres et les stocker dans la base de données MongoDB
-      for (const book of books) {
-        const authorIds = [];
-        for (const authorData of book.authors) {
-          let author = await Author.findOne({ name: authorData.name }); // Trouver l'auteur par son nom
-          if (!author) {
-            // Si l'auteur n'existe pas, le créer
-            author = new Author(authorData);
-            await author.save();
-          }
-          authorIds.push(author._id); // Ajouter l'ID de l'auteur au tableau
+        for (const book of books) {
+            // Gérer les auteurs
+            const authorIds = await Promise.all(book.authors.map(async (authorData) => {
+                let author = await Author.findOne({ name: authorData.name });
+                if (!author) {
+                    author = new Author(authorData);
+                    await author.save();
+                }
+                return author._id;
+            }));
+
+            // Créer et sauvegarder le nouveau livre
+            const newBook = new Book({
+                ...book,
+                authors: authorIds,
+                // Supposons que les traducteurs doivent être ajoutés, ajuster ici
+            });
+            await newBook.save();
+            console.log(`Livre "${newBook.title}" ajouté à la base de données.`);
+
+            // Vérifier si le format de contenu textuel est disponible pour le livre
+            if (newBook.formats['text/plain; charset=us-ascii']) {
+                const contentResponse = await axios.get(newBook.formats['text/plain; charset=us-ascii']);
+                const content = contentResponse.data;
+
+                // Sauvegarder le contenu du livre
+                const newBookContent = new BookContent({
+                    book: newBook._id,
+                    content: content,
+                });
+                await newBookContent.save();
+
+                // Tokeniser et indexer le contenu du livre
+                const tokens = tokenize(content); // Supposons que c'est votre objet original
+                const cleanedTokens = cleanKeys(tokens);
+                const newIndex = new Index({
+                    book: newBook._id,
+                    tokens: cleanedTokens,
+                });
+                await newIndex.save();
+            } else {
+                console.log(`Format de contenu texte non trouvé pour le livre "${newBook.title}".`);
+            }
         }
-
-        const translatorIds = [];
-        for (const translatorData of book.authors) {
-          let translator = await Author.findOne({ name: translatorData.name }); // Trouver le traducteur par son nom
-          if (!translator) {
-            // Si le traducteur n'existe pas, le créer
-            translator = new Author(translatorData);
-            await translator.save();
-          }
-          translatorIds.push(translator._id); // Ajouter l'ID du traducteur au tableau
-        }
-
-        // Créer un nouveau livre avec les ID des auteurs
-        const newBook = new Book({
-          ...book,
-          authors: authorIds,
-          translators: translatorIds,
-        });
-        await newBook.save();
-        console.log(`Livre "${newBook.title}" ajouté à la base de données.`);
-
-        const response = await axios.get(newBook.formats['text/plain; charset=us-ascii'])
-        const content = response.data;
-        const newBookContent = new BookContent({
-            book: newBook._id, // ID du livre nouvellement créé
-            content: content,
-          });
-          await newBookContent.save();
-
-        // Indexer le contenu du livre
-        const tokens = tokenize(content);
-        console.log('tokens: ', tokens);
-        const newIndex = new Index({
-          book: newBook._id,
-          tokens,
-        });
-        await newIndex.save(); 
-      }
-      console.log('Opération terminée.');
+        console.log('Opération terminée.');
     } catch (error) {
-      console.error('Erreur lors de la récupération et du stockage des livres:', error);
+        console.error('Erreur lors de la récupération et du stockage des livres:', error);
     }
-  }
+}
 
-  
 module.exports = { fetchAndStoreBooks };
