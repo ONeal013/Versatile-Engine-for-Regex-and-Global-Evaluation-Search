@@ -45,12 +45,14 @@ async function fetchAndStoreBooks() {
         console.log(`Livre "${newBook.title}" ajouté à la base de données.`);
 
         const response = await axios.get(newBook.formats['text/plain; charset=us-ascii'])
+        const content = response.data;
         const newBookContent = new BookContent({
             book: newBook._id, // ID du livre nouvellement créé
-            content: response.data, // Remplacez par le contenu réel du livre
+            content: content,
           });
           await newBookContent.save();
 
+          
       }
       console.log('Opération terminée.');
     } catch (error) {

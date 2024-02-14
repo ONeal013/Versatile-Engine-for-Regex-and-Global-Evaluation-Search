@@ -8,4 +8,3 @@ const authorSchema = new mongoose.Schema({
 });
 
 module.exports = authorSchema;
-
