@@ -75,13 +75,13 @@ async function fetchAndStoreBooks() {
 
 async function reverseIndex() {
     const indexes = await Index.find();
-    const reverseIndex = {};
+    const reverseIndex = [];
     indexes.forEach(index => {
-        Object.keys(index.tokens).forEach(token => {
+        index.tokens.forEach(token, occurence => {
             if (!reverseIndex[token]) {
-                reverseIndex[token] = [];
+                reverseIndex[token] = {};
             }
-            reverseIndex[token].push(index.book);
+            reverseIndex[token][index.book] = occurence;
         });
     });
     return reverseIndex;

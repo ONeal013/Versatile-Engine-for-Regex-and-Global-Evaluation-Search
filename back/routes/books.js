@@ -17,10 +17,10 @@ router.get('/fetch', async (req, res) => {
 router.get('/reverse', async (req, res) => {
     try {
         const reversedIndexes = await reverseIndex();
-        reverseedIndexes.forEach(async (token, books) => {
+        /* await reversedIndexes.forEach(async (token, books) => {
             const reverseIndex = new ReverseIndex({ token, books });
             await reverseIndex.save();
-        });
+        }); */
         res.json(reversedIndexes);
     } catch (error) {
         res.status(500).send({ error: error.message });
