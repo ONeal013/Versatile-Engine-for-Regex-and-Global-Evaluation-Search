@@ -77,7 +77,7 @@ async function reverseIndex() {
     const indexes = await Index.find();
     const reverseIndex = [];
     indexes.forEach(index => {
-        index.tokens.forEach(token, occurence => {
+        index.tokens.forEach((occurence, token) => {
             if (!reverseIndex[token]) {
                 reverseIndex[token] = {};
             }
