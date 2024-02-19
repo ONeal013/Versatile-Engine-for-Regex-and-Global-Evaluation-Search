@@ -17,17 +17,41 @@ router.get('/fetch', async (req, res) => {
 router.get('/reverse', async (req, res) => {
     try {
         const reversedIndexes = await reverseIndex();
-        console.log(typeof(reversedIndexes))
-        await reversedIndexes.forEach(async (books, token) => {
-            console.log(token,' : ',books)
+        console.log(typeof(reversedIndexes)); // Doit afficher 'object' si c'est un objet
+        await Promise.all(Object.entries(reversedIndexes).map(async ([token, books]) => {
+            console.log(token, ' : ', books);
             const reverseIndex = new ReverseIndex({ token, books });
             await reverseIndex.save();
-        });
+        }));
         res.json(reversedIndexes);
     } catch (error) {
         res.status(500).send({ error: error.message });
     }
-}); 
+});
+
+
+// Ajouté dans back/routes/books.js
+router.get('/search', async (req, res) => {
+    const query = req.query.q; // Assume 'q' est le paramètre de requête contenant le terme de recherche
+    if (!query) {
+        return res.status(400).send({ error: 'Query parameter is missing' });
+    }
+
+    try {
+        const reverseIndexEntry = await ReverseIndex.findOne({ token: query });
+        if (!reverseIndexEntry) {
+            return res.status(404).send({ message: 'No results found' });
+        }
+
+        // Optionnellement, convertir la Map en objet pour la réponse JSON
+        const books = Object.fromEntries(reverseIndexEntry.books);
+        res.json({ token: query, books });
+    } catch (error) {
+        res.status(500).send({ error: error.message });
+    }
+});
+
+
 
 
 
