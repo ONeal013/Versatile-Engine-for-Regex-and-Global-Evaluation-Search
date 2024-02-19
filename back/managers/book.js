@@ -82,10 +82,13 @@ async function reverseIndex() {
                 reverseIndex[token] = {};
             }
             reverseIndex[token][index.book] = occurence;
+            // console.log(token, ' : ', reverseIndex[token])
         });
     });
     return reverseIndex;
 }
+
+
 
 
 module.exports = { fetchAndStoreBooks, reverseIndex};
