@@ -72,4 +72,21 @@ async function fetchAndStoreBooks() {
     }
 }
 
-module.exports = { fetchAndStoreBooks };
+
+async function reverseIndex() {
+    const indexes = await Index.find();
+    const reverseIndex = {};
+    indexes.forEach(index => {
+        Object.keys(index.tokens).forEach(token => {
+            if (!reverseIndex[token]) {
+                reverseIndex[token] = [];
+            }
+            reverseIndex[token].push(index.book);
+        });
+    });
+    return reverseIndex;
+}
+
+
+module.exports = { fetchAndStoreBooks, reverseIndex};
+

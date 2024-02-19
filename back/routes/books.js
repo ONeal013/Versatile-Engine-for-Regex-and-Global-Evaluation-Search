@@ -1,9 +1,9 @@
 const express = require('express');
 const router = express.Router();
-const { fetchAndStoreBooks } = require('../managers/book');
+const { fetchAndStoreBooks, reverseIndex } = require('../managers/book');
 const Book = require('../config/models/book');
+const ReverseIndex = require('../config/models/reverse_index');
 
-// Supposons que fetchAndStoreBooks soit asynchrone et retourne une promesse
 router.get('/fetch', async (req, res) => {
     try {
         await fetchAndStoreBooks();
@@ -13,6 +13,19 @@ router.get('/fetch', async (req, res) => {
         res.status(500).send({ error: error.message });
     }
 });
+
+router.get('/reverse', async (req, res) => {
+    try {
+        const reversedIndexes = await reverseIndex();
+        reverseedIndexes.forEach(async (token, books) => {
+            const reverseIndex = new ReverseIndex({ token, books });
+            await reverseIndex.save();
+        });
+        res.json(reversedIndexes);
+    } catch (error) {
+        res.status(500).send({ error: error.message });
+    }
+}); 
 
 router.get('/', async (req, res) => {
     try {
