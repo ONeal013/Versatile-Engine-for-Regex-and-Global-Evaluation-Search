@@ -1,7 +1,7 @@
 import { StyleSheet, Text, View } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 
-export default function App() {
+export default function Background() {
   return (
     <View style={styles.container}>
       <LinearGradient

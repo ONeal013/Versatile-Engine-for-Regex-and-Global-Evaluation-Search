@@ -7,7 +7,7 @@ export default async function App() {
   // rawait NavigationBar.setBackgroundColorAsync('#FF0000');
   return (
     <View style={styles.container}>
-      <Text></Text>
+      <Text>Text</Text>
       <StatusBar style="auto" />
     </View>
   );
