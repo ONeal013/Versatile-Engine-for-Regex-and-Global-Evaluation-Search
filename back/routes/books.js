@@ -1,8 +1,8 @@
 const express = require('express');
 const router = express.Router();
-const { fetchAndStoreBooks, reverseIndex } = require('../managers/book');
 const Book = require('../config/models/book');
 const ReverseIndex = require('../config/models/reverse_index');
+const JaccardScore = require('../config/models/jaccardScore');
 
 router.get('/fetch', async (req, res) => {
     try {
