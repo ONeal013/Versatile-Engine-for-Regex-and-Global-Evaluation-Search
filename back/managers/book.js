@@ -93,3 +93,20 @@ async function reverseIndex() {
 
 module.exports = { fetchAndStoreBooks, reverseIndex};
 
+
+
+
+const express = require('express');
+const router = express.Router();
+const JaccardScore = require('../config/models/jaccardScore'); 
+
+// Nouvelle route pour obtenir des suggestions basées sur le graphe de Jaccard
+router.get('/suggestions', async (req, res) => {
+    const docId = req.query.docId; // L'ID du document pour lequel obtenir des suggestions
+    try {
+        const suggestions = await JaccardScore.findOne({ docId }).exec();
+        res.json(suggestions);
+    } catch (error) {
+        res.status(500).send({ error: error.message });
+    }
+});
