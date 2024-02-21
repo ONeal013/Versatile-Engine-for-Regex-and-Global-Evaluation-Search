@@ -1,14 +1,24 @@
 import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, Text, TextInput, View } from 'react-native';
 import * as NavigationBar from 'expo-navigation-bar';
+import KBackground from './src/components/Background';
+import KTextInput from './src/components/TextInput';
+import Colors from './src/styles/colors';
+import KButton from './src/components/Button';
+import Physics from './src/styles/physics';
 
-export default async function App() {
+export default function App() {
   // set system nav bar color to red
-  // rawait NavigationBar.setBackgroundColorAsync('#FF0000');
+  // await NavigationBar.setBackgroundColorAsync('#FF0000');
+  NavigationBar.setBackgroundColorAsync('#1d2437');
   return (
     <View style={styles.container}>
-      <Text>Text</Text>
-      <StatusBar style="auto" />
+      <StatusBar style="light" />
+      <KBackground />
+      <View style={styles.row}>
+        <KTextInput />
+        <KButton title="Submit" onPress={() => console.log('Button pressed')} />
+      </View>
     </View>
   );
 }
@@ -16,8 +26,14 @@ export default async function App() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
     alignItems: 'center',
     justifyContent: 'center',
   },
+  row: {
+    padding: Physics.padding.medium,
+    gap: Physics.gap.medium,
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    alignItems: 'center',
+  }
 });
