@@ -22,19 +22,19 @@ router.get('/authors', async (req, res) => {
     }
 });
 
-// Endpoint pour récupérer les auteurs d'un livre spécifique par l'ID du livre
-router.get('/authors/:bookId', async (req, res) => {
-  try {
-      const bookId = req.params.bookId;
-      const book = await Book.findById(bookId).populate('authors');
-      if (book) {
-          res.json(book.authors);
-      } else {
-          res.status(404).send({ message: 'Book not found' });
-      }
-  } catch (error) {
-      res.status(500).send({ error: error.message });
-  }
+// Endpoint pour récupérer les informations d'un auteur spécifique par son ID
+router.get('/authors/:id', async (req, res) => {
+    try {
+        const authorId = req.params.id;
+        const author = await Author.findById(authorId);
+        if (author) {
+            res.json(author);
+        } else {
+            res.status(404).send({ message: 'Author not found' });
+        }
+    } catch (error) {
+        res.status(500).send({ error: error.message });
+    }
 });
 
 module.exports = router;
