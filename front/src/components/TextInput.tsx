@@ -1,6 +1,6 @@
 import { StyleSheet, Text, TextInput, View } from 'react-native';
-import Colors from '../styles/colors';
-import Physics from '../styles/physics';
+import Colors from '../constants/colors';
+import Physics from '../constants/physics';
 
 interface Props {
     placeholder?: string;

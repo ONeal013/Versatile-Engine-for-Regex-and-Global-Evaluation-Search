@@ -1,7 +1,7 @@
 import { StyleSheet, Text, View, ViewStyle } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
-import Colors from '../styles/colors';
-import Physics from '../styles/physics';
+import Colors from '../constants/colors';
+import Physics from '../constants/physics';
 import Ionicons from '@expo/vector-icons/Ionicons';
 
 interface Props {
