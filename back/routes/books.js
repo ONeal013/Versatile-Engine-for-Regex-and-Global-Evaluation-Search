@@ -103,6 +103,7 @@ router.get('/advanced-search', async (req, res) => {
         const searchPattern = new RegExp(regex, 'i'); 
         const results = await Content.find({ content: { $regex: searchPattern } }).exec();
 
+        
         if (results.length > 0) {
             res.json(results);
         } else {
