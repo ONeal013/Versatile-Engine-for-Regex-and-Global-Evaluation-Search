@@ -102,10 +102,13 @@ router.get('/advanced-search', async (req, res) => {
     try {
         const searchPattern = new RegExp(regex, 'i'); 
         const results = await Content.find({ content: { $regex: searchPattern } }).exec();
-
-        
+        const data = await Promise.all(results.map((item) => {
+            return Book.findById(item.book).populate({
+                path: 'authors'
+            })
+        }))
         if (results.length > 0) {
-            res.json(results);
+            res.json(data);
         } else {
             res.send('No books found matching the regex.');
         }
