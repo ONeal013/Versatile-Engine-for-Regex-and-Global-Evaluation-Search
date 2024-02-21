@@ -17,7 +17,7 @@ export default function App() {
       <KBackground />
       <View style={styles.row}>
         <KTextInput />
-        <KButton title="Submit" onPress={() => console.log('Button pressed')} />
+        <KButton title="Search" onPress={() => console.log('Button pressed')} />
       </View>
     </View>
   );
@@ -31,9 +31,10 @@ const styles = StyleSheet.create({
   },
   row: {
     padding: Physics.padding.medium,
-    gap: Physics.gap.medium,
-    flexDirection: 'row',
-    flexWrap: 'wrap',
+    gap: Physics.gap.large,
+    // backgroundColor: Colors.light.primary,
+    width: '100%',
+    flexDirection: 'column',
     alignItems: 'center',
   }
 });

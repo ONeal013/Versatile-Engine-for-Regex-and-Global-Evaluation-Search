@@ -31,6 +31,7 @@ const styles = StyleSheet.create({
   },
   text: {
     fontSize: Physics.text.body.medium,
+    fontWeight: 'bold',
     color: Colors.dark.textInput.background ?? Colors.dark.text ?? '#fff',
   },
 });
