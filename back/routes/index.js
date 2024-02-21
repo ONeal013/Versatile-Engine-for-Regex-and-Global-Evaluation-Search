@@ -58,24 +58,25 @@ router.get('/contents', async (req, res) => {
 });
 
 router.get('/contents/:bookId', async (req, res) => {
-  try {
-      const bookId = req.params.bookId;
-      const contents = await Content.find({ book: bookId })
-          .populate({
-              path: 'book',
-              populate: {
-                  path: 'authors' 
-              }
-          });
-      if (contents.length) {
-          res.json(contents);
-      } else {
-          res.status(404).send({ message: 'No content found for this book' });
-      }
-  } catch (error) {
-      res.status(500).send({ error: error.message });
-  }
+    try {
+        const bookId = req.params.bookId;
+        const content = await Content.findOne({ book: bookId })
+            .populate({
+                path: 'book',
+                populate: {
+                    path: 'authors'
+                }
+            });
+        if (content) { 
+            res.json(content);
+        } else {
+            res.status(404).send({ message: 'No content found for this book' });
+        }
+    } catch (error) {
+        res.status(500).send({ error: error.message });
+    }
 });
+
 
 
 
