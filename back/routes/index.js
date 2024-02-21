@@ -57,6 +57,9 @@ router.get('/contents', async (req, res) => {
   }
 });
 
+
+
+
 router.get('/contents/:bookId', async (req, res) => {
     try {
         const bookId = req.params.bookId;
@@ -76,7 +79,6 @@ router.get('/contents/:bookId', async (req, res) => {
         res.status(500).send({ error: error.message });
     }
 });
-
 
 
 
