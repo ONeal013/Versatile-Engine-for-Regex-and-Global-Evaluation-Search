@@ -75,8 +75,8 @@ router.get('/suggestions', async (req, res) => {
 
 router.get('/', async (req, res) => {
     try {
-        const books = await Book.find().exec(); // Utilisez await ici
-        res.json(books); // Utilisez res.json pour envoyer les résultats
+        const books = await Book.find().populate('authors').exec(); // Modification ici
+        res.json(books);
     } catch (error) {
         res.status(500).send({ error: error.message });
     }
