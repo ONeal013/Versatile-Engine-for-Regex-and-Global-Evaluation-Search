@@ -32,35 +32,44 @@ router.get('/reverse', async (req, res) => {
 
 
 router.get('/search', async (req, res) => {
-    let query = req.query.q; // Assume 'q' est le paramètre de requête contenant le terme de recherche
+    let query = req.query.q;
     if (!query) {
         return res.status(400).send({ error: 'Query parameter is missing' });
     }
 
-    // Convertir la chaîne de recherche en minuscules
-    query = query.toLowerCase();
+    const queries = query.toLowerCase().split(" ");
+    let results = []; // Utiliser un tableau pour stocker les résultats directement
 
     try {
-        const reverseIndexEntry = await ReverseIndex.findOne({ token: query });
-        if (!reverseIndexEntry) {
-            return res.status(404).send({ message: 'No results found' });
+        for (const singleQuery of queries) {
+            const reverseIndexEntry = await ReverseIndex.findOne({ token: singleQuery });
+            if (reverseIndexEntry) {
+                const bookIds = Array.from(reverseIndexEntry.books.keys());
+                const booksData = await Book.find({ '_id': { $in: bookIds } }).exec();
+                
+                // Pour chaque mot-clé, stocker les résultats directement dans le tableau
+                results.push({
+                    token: singleQuery,
+                    books: Object.fromEntries(reverseIndexEntry.books),
+                    data: booksData
+                });
+            } else {
+                // Si aucun résultat n'est trouvé pour un mot-clé, inclure un message d'absence de résultats
+                results.push({
+                    token: singleQuery,
+                    message: 'No results found'
+                });
+            }
         }
 
-        // Convertir la Map ou l'objet des identifiants de livres en un tableau d'identifiants
-        const bookIds = Array.from(reverseIndexEntry.books.keys());
-
-        // Rechercher tous les livres dont les identifiants correspondent à ceux trouvés
-        const booksData = await Book.find({ '_id': { $in: bookIds } }).exec();
-
-        // Optionnellement, convertir la Map en objet pour la réponse JSON si nécessaire pour d'autres utilisations
-        const books = Object.fromEntries(reverseIndexEntry.books);
-
-        // Envoyer les données récupérées
-        res.json({ token: query, books, data: booksData });
+        // Envoyer le tableau des résultats
+        res.json(results);
     } catch (error) {
         res.status(500).send({ error: error.message });
     }
 });
+
+
 
 
 
