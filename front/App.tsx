@@ -11,7 +11,8 @@ import React from 'react';
 import KSearchResult from './src/components/search_result';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import Strings from './src/constants/strings';
-import LottieView from 'lottie-react-native';
+import { ActivityIndicator } from 'react-native';
+
 
 export default function App() {
   NavigationBar.setBackgroundColorAsync('#1d2437');
@@ -34,7 +35,7 @@ export default function App() {
         </SafeAreaProvider>
       </View>
       <View style={styles.resultZone}>
-        {isLoadingComplete === false && <LottieView source={require('./assets/lotties/loading.json')} autoPlay loop />}
+        {isLoadingComplete === false && <ActivityIndicator size="large" color="#0000ff" />}
         {isLoadingComplete === true && results !== null && (
           <ScrollView style={styles.resultList}>
             {
