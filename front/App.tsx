@@ -1,5 +1,5 @@
 import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, TextInput, View } from 'react-native';
+import { ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
 import * as NavigationBar from 'expo-navigation-bar';
 import KBackground from './src/components/Background';
 import KTextInput from './src/components/TextInput';
@@ -8,6 +8,8 @@ import KButton from './src/components/Button';
 import Physics from './src/constants/physics';
 import { useSearch } from './src/hooks/search/basic';
 import React from 'react';
+import KSearchResult from './src/components/search_result';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 export default function App() {
   // set system nav bar color to red
@@ -22,18 +24,24 @@ export default function App() {
     <View style={styles.container}>
       <StatusBar style="light" />
       <KBackground />
-      <View style={styles.searchZone}>
-        <KTextInput value={term} onChangeText={setTerm} />
-        <KButton title="Search" onPress={() => searchStr(term)} />
-      </View>
-      {isLoadingComplete === false && <Text>Loading...</Text>}
-      {isLoadingComplete === true && results !== null && (
-        <View style={styles.resultZone}>
-          {(results.data ?? []).map((book, i) => (
-            <Text key={i}>{book.title}</Text>
-          ))}
+      <SafeAreaView>
+        <View style={styles.searchZone}>
+          <KTextInput value={term} onChangeText={setTerm} />
+          <KButton title="Search" onPress={() => searchStr(term)} />
         </View>
-      )}
+        {isLoadingComplete === false && <Text>Loading...</Text>}
+        {isLoadingComplete === true && results !== null && (
+          <View style={styles.resultZone}>
+            <ScrollView style={styles.resultList}>
+              {(results.data ?? []).map((book, i) => (
+                <View key={i} style={styles.resultItem}>
+                  <KSearchResult book={book} />
+                </View>
+              ))}
+            </ScrollView>
+          </View>
+        )}
+      </SafeAreaView>
     </View>
   );
 }
@@ -48,15 +56,21 @@ const styles = StyleSheet.create({
     padding: Physics.padding.medium,
     gap: Physics.gap.large,
     // backgroundColor: Colors.light.primary,
-    width: '100%',
     maxWidth: 400,
-    flexDirection: 'column',
+    flexDirection: 'row',
+    flexWrap: 'wrap',
     alignItems: 'center',
+    justifyContent: 'center',
   },
   resultZone: {
     flex: 1,
-    padding: Physics.padding.medium,
+    paddingHorizontal: Physics.padding.medium,
+  },
+  resultList: {
+    flex: 1,
     gap: Physics.gap.large,
-    width: '100%',
+  },
+  resultItem: {
+    paddingBottom: Physics.padding.medium,
   },
 });

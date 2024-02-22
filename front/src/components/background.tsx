@@ -16,10 +16,10 @@ const randStr = () => toStr(Math.random() * (max - min) + min);
 
 const generatePosition = () => {
   const position = {
-    top: '0%',
-    left: '0%',
-    bottom: '0%',
-    right: '0%',
+    top: '',
+    left: '',
+    bottom: '',
+    right: '',
   };
   // gen random position
   var random = Math.random();

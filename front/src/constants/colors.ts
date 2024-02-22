@@ -4,7 +4,12 @@ export type ColorTheme = {
   secondary: string;
   secondaryDark: string;
   icon: string;
-  text: string;
+  text: {
+    body: string;
+    title: string;
+    subtitle: string;
+    header: string;
+  };
   textInput: {
     background: string;
     placeholder: string;
@@ -33,7 +38,12 @@ const Colors: ColorPalettes = {
     secondary: "#737df7",
     secondaryDark: "#ea5cc3",
     icon: "#566fb0",
-    text: "#FFFFFF",
+    text: {
+      body: "#000",
+      title: "#000",
+      subtitle: "grey",
+      header: "#000",
+    },
     textInput: {
       background: "white",
       placeholder: "#6A6A6A",
@@ -47,7 +57,12 @@ const Colors: ColorPalettes = {
     secondary: "#737df7",
     secondaryDark: "#ea5cc3",
     icon: "#566fb0",
-    text: "#FFFFFF",
+    text: {
+      body: "#000",
+      title: "#000",
+      subtitle: "grey",
+      header: "#000",
+    },
     textInput: {
       background: "white",
       placeholder: "#6A6A6A",
