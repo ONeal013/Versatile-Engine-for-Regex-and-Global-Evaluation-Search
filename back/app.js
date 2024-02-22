@@ -22,16 +22,3 @@ app.listen(port, () => {
   console.log(`Example app listening on port ${port}`)
 })
 
-
-// Middleware pour activer le CORS
-app.use(function(req, res, next) {
-  res.header("Access-Control-Allow-Origin", "*"); // "*" pour autoriser toutes les origines
-  res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
-  next();
-});
-
-// Vos routes ici
-
-app.listen(3000, () => {
-  console.log('Serveur démarré sur le port 3000');
-});
