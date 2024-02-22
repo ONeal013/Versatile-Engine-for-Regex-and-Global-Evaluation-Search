@@ -32,35 +32,43 @@ router.get('/reverse', async (req, res) => {
 
 
 router.get('/search', async (req, res) => {
-    let query = req.query.q; // Assume 'q' est le paramètre de requête contenant le terme de recherche
+    let query = req.query.q; 
     if (!query) {
         return res.status(400).send({ error: 'Query parameter is missing' });
     }
 
-    // Convertir la chaîne de recherche en minuscules
-    query = query.toLowerCase();
+    const queries = query.toLowerCase().split(" ");
+    let booksMap = new Map();
 
     try {
-        const reverseIndexEntry = await ReverseIndex.findOne({ token: query });
-        if (!reverseIndexEntry) {
+        for (const singleQuery of queries) {
+            const reverseIndexEntry = await ReverseIndex.findOne({ token: singleQuery });
+            if (reverseIndexEntry) {
+                // Fusionner les résultats pour chaque mot-clé
+                for (let [bookId, occurrences] of reverseIndexEntry.books) {
+                    if (!booksMap.has(bookId)) {
+                        booksMap.set(bookId, occurrences);
+                    } else {
+                        booksMap.set(bookId, booksMap.get(bookId) + occurrences);
+                    }
+                }
+            }
+        }
+
+        if (booksMap.size === 0) {
             return res.status(404).send({ message: 'No results found' });
         }
 
-        // Convertir la Map ou l'objet des identifiants de livres en un tableau d'identifiants
-        const bookIds = Array.from(reverseIndexEntry.books.keys());
-
-        // Rechercher tous les livres dont les identifiants correspondent à ceux trouvés
+        const bookIds = Array.from(booksMap.keys());
         const booksData = await Book.find({ '_id': { $in: bookIds } }).exec();
+        const books = Object.fromEntries(booksMap);
 
-        // Optionnellement, convertir la Map en objet pour la réponse JSON si nécessaire pour d'autres utilisations
-        const books = Object.fromEntries(reverseIndexEntry.books);
-
-        // Envoyer les données récupérées
         res.json({ token: query, books, data: booksData });
     } catch (error) {
         res.status(500).send({ error: error.message });
     }
 });
+
 
 
 
