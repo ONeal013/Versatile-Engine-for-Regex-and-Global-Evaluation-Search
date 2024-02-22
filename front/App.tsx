@@ -11,7 +11,8 @@ import KSearchResult from './src/components/search_result';
 import { useSearch } from './src/hooks/search/basic';
 import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 import Strings from './src/constants/strings';
-import LottieView from 'lottie-react-native';
+import { ActivityIndicator } from 'react-native';
+
 
 export default function App() {
   NavigationBar.setBackgroundColorAsync('#1d2437');
@@ -33,7 +34,7 @@ export default function App() {
           <KButton title={Strings.search} onPress={() => searchStr(term)} />
         </SafeAreaView>
         <View style={styles.resultZone}>
-          {isLoadingComplete === false && <LottieView style={{ flex: 1 }} source={require('./assets/lotties/placeholder_loading.json')} autoPlay loop />}
+          {isLoadingComplete === false && <ActivityIndicator size="large" color="#0000ff" />}
           {isLoadingComplete === true && results !== null && (
             <ScrollView style={styles.resultList}>
               {
