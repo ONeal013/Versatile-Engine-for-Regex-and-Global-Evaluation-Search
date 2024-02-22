@@ -3,6 +3,7 @@ export type ColorTheme = {
   primaryDark: string;
   secondary: string;
   secondaryDark: string;
+  canvas: string;
   icon: string;
   text: {
     body: string;
@@ -38,6 +39,7 @@ const Colors: ColorPalettes = {
     secondary: "#737df7",
     secondaryDark: "#ea5cc3",
     icon: "#566fb0",
+    canvas: "#1d2437",
     text: {
       body: "#000",
       title: "#000",
@@ -57,6 +59,7 @@ const Colors: ColorPalettes = {
     secondary: "#737df7",
     secondaryDark: "#ea5cc3",
     icon: "#566fb0",
+    canvas: "#ffffffeb",
     text: {
       body: "#000",
       title: "#000",

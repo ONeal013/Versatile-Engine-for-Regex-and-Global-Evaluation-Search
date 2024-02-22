@@ -9,11 +9,11 @@ import Physics from './src/constants/physics';
 import { useSearch } from './src/hooks/search/basic';
 import React from 'react';
 import KSearchResult from './src/components/search_result';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { SafeAreaProvider } from 'react-native-safe-area-context';
+import Strings from './src/constants/strings';
+import LottieView from 'lottie-react-native';
 
 export default function App() {
-  // set system nav bar color to red
-  // await NavigationBar.setBackgroundColorAsync('#FF0000');
   NavigationBar.setBackgroundColorAsync('#1d2437');
 
   // hooks
@@ -22,26 +22,33 @@ export default function App() {
 
   return (
     <View style={styles.container}>
-      <StatusBar style="light" />
+      {results?.data
+        ? <StatusBar style="dark" />
+        : <StatusBar style="light" />
+      }
       <KBackground />
-      <SafeAreaView>
-        <View style={styles.searchZone}>
-          <KTextInput value={term} onChangeText={setTerm} />
-          <KButton title="Search" onPress={() => searchStr(term)} />
-        </View>
-        {isLoadingComplete === false && <Text>Loading...</Text>}
+      <View style={results?.data ? { backgroundColor: Colors.light.canvas, elevation: Physics.elevation.medium } : {}}>
+        <SafeAreaProvider style={styles.searchZone}>
+          <KTextInput value={term} onChangeText={setTerm} containerStyle={results?.data ? { elevation: 0 } : {}} />
+          <KButton title={Strings.search} onPress={() => searchStr(term)} />
+        </SafeAreaProvider>
+      </View>
+      <View style={styles.resultZone}>
+        {isLoadingComplete === false && <LottieView source={require('./assets/lotties/loading.json')} autoPlay loop />}
         {isLoadingComplete === true && results !== null && (
-          <View style={styles.resultZone}>
-            <ScrollView style={styles.resultList}>
-              {(results.data ?? []).map((book, i) => (
-                <View key={i} style={styles.resultItem}>
-                  <KSearchResult book={book} />
-                </View>
-              ))}
-            </ScrollView>
-          </View>
+          <ScrollView style={styles.resultList}>
+            {
+              (results.message !== undefined)
+                ? <Text>{results.message}</Text>
+                : (results.data ?? []).map((book, i) => (
+                  <View key={i} style={styles.resultItem}>
+                    <KSearchResult book={book} />
+                  </View>
+                ))
+            }
+          </ScrollView>
         )}
-      </SafeAreaView>
+      </View>
     </View>
   );
 }
@@ -54,21 +61,20 @@ const styles = StyleSheet.create({
   },
   searchZone: {
     padding: Physics.padding.medium,
-    gap: Physics.gap.large,
+    gap: Physics.gap.small,
+    width: '100%',
     // backgroundColor: Colors.light.primary,
-    maxWidth: 400,
     flexDirection: 'row',
-    flexWrap: 'wrap',
-    alignItems: 'center',
-    justifyContent: 'center',
+    // flexWrap: 'wrap',
   },
   resultZone: {
     flex: 1,
-    paddingHorizontal: Physics.padding.medium,
   },
   resultList: {
     flex: 1,
     gap: Physics.gap.large,
+    paddingLeft: Physics.padding.medium,
+    paddingRight: Physics.padding.medium,
   },
   resultItem: {
     paddingBottom: Physics.padding.medium,

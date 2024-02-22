@@ -2,6 +2,7 @@ import { Pressable, StyleSheet, Text, View } from 'react-native';
 import Colors from '../constants/colors';
 import Physics from '../constants/physics';
 import { Book } from '../models/book';
+import Strings from '../constants/strings';
 
 interface Props {
     book: Book;
@@ -16,16 +17,22 @@ export default function KSearchResult(props: Props) {
                 <View>
                     <Text style={styles.title}>{book.title}</Text>
                 </View>
-                <View style={styles.subtitleContainer}>
-                    {book.authors.map((author, i) => (
-                        <Text key={i} style={styles.subtitle}>{author.name}</Text>
-                    ))}
+                <View style={{ flexDirection: 'row', flexWrap: 'wrap' }}>
+                    <Text>{Strings.authors}: </Text>
+                    <View style={styles.subtitleContainer}>
+                        {book.authors.length > 1
+                            ? book.authors.slice(0, 2).map((author, i) => (
+                                <Text key={i} style={styles.subtitle}>{author.name}</Text>
+                            ))
+                            : <Text style={styles.subtitle}>{Strings.unknown}</Text>
+                        }
+                    </View>
                 </View>
                 <View style={styles.bottomContainer}>
                     <Text>Subjects: </Text>
-                    {book.subjects.map((subject, i) => (
-                        <Text key={i} style={{ ...styles.subtitle, }}>{subject}</Text>
-                    ))}
+                    <Text style={{ ...styles.subtitle, }}>
+                        {book.subjects.slice(0, 2).map((subject, i) => subject)}
+                    </Text>
                 </View>
             </View>
         </Pressable >
@@ -38,9 +45,8 @@ const styles = StyleSheet.create({
         fontWeight: 'bold',
         color: Colors.light.textInput.background ?? Colors.light.text ?? '#fff',
         borderRadius: Physics.borderRadius.medium,
-        backgroundColor: Colors.light.textInput.background,
+        backgroundColor: Colors.light.canvas,
         padding: Physics.padding.medium,
-        elevation: Physics.elevation.medium,
         flexDirection: 'column',
     },
     title: {

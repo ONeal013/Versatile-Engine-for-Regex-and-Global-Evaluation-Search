@@ -1,4 +1,4 @@
-import { StyleSheet, Text, TextInput, View } from 'react-native';
+import { StyleSheet, Text, TextInput, View, ViewStyle } from 'react-native';
 import Colors from '../constants/colors';
 import Physics from '../constants/physics';
 
@@ -6,6 +6,7 @@ interface Props {
     placeholder?: string;
     value?: string;
     onChangeText?: (text: string) => void;
+    containerStyle?: ViewStyle;
 }
 
 export default function KTextInput(props: Props) {
@@ -13,9 +14,13 @@ export default function KTextInput(props: Props) {
         placeholder: 'Type something...',
     };
     props = Object.assign(initProps, props);
+    const containerStyle = Object.assign({ ...styles.container }, props.containerStyle);
+
+    console.log('KTextInput: ', props);
+    console.log('KTextInput: ', containerStyle);
 
     return (
-        <View style={styles.container}>
+        <View style={containerStyle}>
             <TextInput
                 style={styles.input}
                 placeholder={props.placeholder}
@@ -29,8 +34,8 @@ export default function KTextInput(props: Props) {
 
 const styles = StyleSheet.create({
     container: {
-        // flex: 1,
-        width: '100%',
+        flex: 1,
+        // width: '100%',
         alignItems: 'center',
         justifyContent: 'center',
     },
