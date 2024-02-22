@@ -32,42 +32,43 @@ router.get('/reverse', async (req, res) => {
 
 
 router.get('/search', async (req, res) => {
-    let query = req.query.q; 
+    let query = req.query.q;
     if (!query) {
         return res.status(400).send({ error: 'Query parameter is missing' });
     }
 
     const queries = query.toLowerCase().split(" ");
-    let booksMap = new Map();
+    let results = []; // Utiliser un tableau pour stocker les résultats directement
 
     try {
         for (const singleQuery of queries) {
             const reverseIndexEntry = await ReverseIndex.findOne({ token: singleQuery });
             if (reverseIndexEntry) {
-                // Fusionner les résultats pour chaque mot-clé
-                for (let [bookId, occurrences] of reverseIndexEntry.books) {
-                    if (!booksMap.has(bookId)) {
-                        booksMap.set(bookId, occurrences);
-                    } else {
-                        booksMap.set(bookId, booksMap.get(bookId) + occurrences);
-                    }
-                }
+                const bookIds = Array.from(reverseIndexEntry.books.keys());
+                const booksData = await Book.find({ '_id': { $in: bookIds } }).exec();
+                
+                // Pour chaque mot-clé, stocker les résultats directement dans le tableau
+                results.push({
+                    token: singleQuery,
+                    books: Object.fromEntries(reverseIndexEntry.books),
+                    data: booksData
+                });
+            } else {
+                // Si aucun résultat n'est trouvé pour un mot-clé, inclure un message d'absence de résultats
+                results.push({
+                    token: singleQuery,
+                    message: 'No results found'
+                });
             }
         }
 
-        if (booksMap.size === 0) {
-            return res.status(404).send({ message: 'No results found' });
-        }
-
-        const bookIds = Array.from(booksMap.keys());
-        const booksData = await Book.find({ '_id': { $in: bookIds } }).exec();
-        const books = Object.fromEntries(booksMap);
-
-        res.json({ token: query, books, data: booksData });
+        // Envoyer le tableau des résultats
+        res.json(results);
     } catch (error) {
         res.status(500).send({ error: error.message });
     }
 });
+
 
 
 
