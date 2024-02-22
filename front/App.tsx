@@ -3,7 +3,6 @@ import { ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
 import * as NavigationBar from 'expo-navigation-bar';
 import KBackground from './src/components/Background';
 import KTextInput from './src/components/TextInput';
-import Colors from './src/constants/colors';
 import KButton from './src/components/Button';
 import Physics from './src/constants/physics';
 import React from 'react';

@@ -16,8 +16,8 @@ export default function KTextInput(props: Props) {
     props = Object.assign(initProps, props);
     const containerStyle = Object.assign({ ...styles.container }, props.containerStyle);
 
-    console.log('KTextInput: ', props);
-    console.log('KTextInput: ', containerStyle);
+    // console.log('KTextInput: ', props);
+    // console.log('KTextInput: ', containerStyle);
 
     return (
         <View style={containerStyle}>
