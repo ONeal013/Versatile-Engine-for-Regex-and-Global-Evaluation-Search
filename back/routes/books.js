@@ -32,10 +32,13 @@ router.get('/reverse', async (req, res) => {
 
 
 router.get('/search', async (req, res) => {
-    const query = req.query.q; // Assume 'q' est le paramètre de requête contenant le terme de recherche
+    let query = req.query.q; // Assume 'q' est le paramètre de requête contenant le terme de recherche
     if (!query) {
         return res.status(400).send({ error: 'Query parameter is missing' });
     }
+
+    // Convertir la chaîne de recherche en minuscules
+    query = query.toLowerCase();
 
     try {
         const reverseIndexEntry = await ReverseIndex.findOne({ token: query });
