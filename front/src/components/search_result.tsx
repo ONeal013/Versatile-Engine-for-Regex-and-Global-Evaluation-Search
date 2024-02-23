@@ -3,6 +3,7 @@ import Colors from '../constants/colors';
 import Physics from '../constants/physics';
 import { Book } from '../models/book';
 import Strings from '../constants/strings';
+import Ionicons from '@expo/vector-icons/Ionicons';
 
 interface Props {
     book: Book;
@@ -12,7 +13,10 @@ interface Props {
 export default function KSearchResult(props: Props) {
     const book = props.book;
     return (
-        <Pressable onPress={props.onPress}>
+        <Pressable style={styles.wrapper} onPress={props.onPress}>
+            <View style={styles.leading}>
+                <Ionicons name="book" size={Physics.icon.large} color={Colors.light.primaryDark} />
+            </View>
             <View style={styles.container}>
                 <View>
                     <Text style={styles.title}>{book.title}</Text>
@@ -30,7 +34,7 @@ export default function KSearchResult(props: Props) {
                 </View>
                 <View style={styles.bottomContainer}>
                     <Text>Subjects: </Text>
-                    <Text style={{ ...styles.subtitle, }}>
+                    <Text style={{ ...styles.subtitle, flex: 1 }} numberOfLines={1}>
                         {book.subjects.slice(0, 2).map((subject, i) => subject)}
                     </Text>
                 </View>
@@ -40,13 +44,25 @@ export default function KSearchResult(props: Props) {
 }
 
 const styles = StyleSheet.create({
-    container: {
-        fontSize: Physics.text.body.medium,
-        fontWeight: 'bold',
+    wrapper: {
+        padding: Physics.padding.medium,
+        gap: Physics.gap.large,
+        width: '100%',
+        flexDirection: 'row',
+        alignItems: 'center',
         color: Colors.light.textInput.background ?? Colors.light.text ?? '#fff',
         borderRadius: Physics.borderRadius.medium,
         backgroundColor: Colors.light.canvas,
-        padding: Physics.padding.medium,
+    },
+    leading: {
+        paddingVertical: Physics.padding.medium,
+        paddingHorizontal: Physics.padding.large,
+        borderRadius: Physics.borderRadius.medium,
+        backgroundColor: Colors.light.background,
+    },
+    container: {
+        fontSize: Physics.text.body.medium,
+        fontWeight: 'bold',
         flexDirection: 'column',
     },
     title: {
@@ -62,7 +78,6 @@ const styles = StyleSheet.create({
     },
     bottomContainer: {
         flexDirection: 'row',
-        flexWrap: 'wrap',
         gap: Physics.gap.small,
         columnGap: 0,
     },

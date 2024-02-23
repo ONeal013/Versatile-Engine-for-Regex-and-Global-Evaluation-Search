@@ -27,6 +27,7 @@ const styles = StyleSheet.create({
     paddingVertical: Physics.padding.medium,
     paddingHorizontal: Physics.padding.large,
     borderRadius: Physics.borderRadius.medium,
+    ...Physics.shadow,
     elevation: Physics.elevation.medium,
   },
   text: {

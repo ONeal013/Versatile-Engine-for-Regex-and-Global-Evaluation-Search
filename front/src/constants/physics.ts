@@ -6,13 +6,21 @@ const Physics = {
   },
   borderRadius: {
     small: 8,
-    medium: 16,
+    medium: 12,
     large: 24,
   },
   elevation: {
     small: 5,
     medium: 10,
     large: 15,
+  },
+  shadow: {
+    shadowOffset: {
+      width: 0,
+      height: 3.5,
+    },
+    shadowOpacity: 0.2,
+    shadowRadius: 7.5,
   },
   margin: {
     small: 12,
