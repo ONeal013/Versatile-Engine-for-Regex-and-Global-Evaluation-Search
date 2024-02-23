@@ -2,6 +2,8 @@ const express = require('express');
 const router = express.Router();
 const Book = require('../config/models/book');
 const ReverseIndex = require('../config/models/reverse_index');
+const tokenize = require('../managers/indexor');
+const levenshtein = require('js-levenshtein');
 const { reverseIndex } = require('../managers/book');
 
 router.get('/fetch', async (req, res) => {
@@ -29,9 +31,75 @@ router.get('/reverse', async (req, res) => {
     }
 });
 
+const correctQueries = async (queries) => {
+    const corrections = [];
+    const _indexes = await ReverseIndex.find().exec();
+    for (const query in queries) {
+        let correction = query;
+        let score = -1;
+        for (const index in _indexes) {
+            const newScore = levenshtein(index.token, query);
+            if (score > newScore) {
+                correction = index.token;
+                score = newScore;
+            }
+            corrections.push(correction);
+        }
+    }
+    return corrections;
+}
 
 
+router.get('/search', async (req, res) => {
+    let query = req.query.q;
+    if (!query) {
+        return res.status(400).send({ error: 'Query parameter is missing' });
+    }
 
+    const queries = tokenize(query.toLowerCase());
+    let result = {
+        tokens: {},
+        data: [],
+    };
+
+    const data = new Set();
+
+    try {
+        for (const singleQuery of Object.keys(queries)) {
+            console.log(singleQuery);
+            // Remarque : L'opérateur $search nécessite MongoDB Atlas Full-Text Search
+            // Vous devrez remplacer ReverseIndex.find() par ReverseIndex.aggregate() pour utiliser $search
+            const reverseIndexEntries = await ReverseIndex.aggregate([
+                {
+                    $search: {
+                        text: {
+                            query: singleQuery,
+                            path: "token", // Assurez-vous que cela correspond à votre modèle de données
+                            fuzzy: {}
+                        }
+                    },
+                }, 
+                { $limit: 1 }
+            ]);
+            console.log(reverseIndexEntries);
+
+            for (const entry of reverseIndexEntries) {
+                // Supposons que 'books' est un tableau d'identifiants dans vos documents ReverseIndex
+                const books = entry.books
+                const bookIds = Object.keys(books)
+
+                result.tokens[entry.token] = entry.books
+                console.log(data);
+                bookIds.forEach(id => data.add(id));
+            }
+        }
+        result.data = await Book.find({ '_id': { $in: Array.from(data) } });
+        res.json(result);
+    } catch (error) {
+        console.error(error);
+        res.status(500).send({ error: error.message });
+    }
+});
 
 
 
