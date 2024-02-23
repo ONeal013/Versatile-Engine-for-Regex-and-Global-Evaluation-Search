@@ -17,14 +17,3 @@ const tokenize = (data) => {
 
 module.exports = tokenize;
 
-
-const calculateJaccardIndex = (doc1Tokens, doc2Tokens) => {
-    const set1 = new Set(doc1Tokens);
-    const set2 = new Set(doc2Tokens);
-    const intersection = new Set([...set1].filter(x => set2.has(x)));
-    const union = new Set([...set1, ...set2]);
-    return intersection.size / union.size;
-};
-
-
-module.exports.calculateJaccardIndex = calculateJaccardIndex;

@@ -73,21 +73,6 @@ router.get('/search', async (req, res) => {
 
 
 
-router.get('/suggestions', async (req, res) => {
-    const docId = req.query.docId; // L'ID du document pour lequel obtenir des suggestions
-    try {
-        const suggestions = await JaccardScore.findOne({ docId }).exec();
-        const sortedSimilarDocs = suggestions.similarDocs.sort((a, b) => b.score - a.score);
-        const topSimilarDocs = sortedSimilarDocs.slice(1, 6);
-        
-        if (!suggestions) {
-            return res.status(404).send({ message: 'No suggestions found for this document.' });
-        }
-        res.json(topSimilarDocs);
-    } catch (error) {
-        res.status(500).send({ error: error.message });
-    }
-});
 
 
 
