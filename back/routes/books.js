@@ -2,8 +2,9 @@ const express = require('express');
 const router = express.Router();
 const Book = require('../config/models/book');
 const ReverseIndex = require('../config/models/reverse_index');
-const JaccardScore = require('../config/models/jaccardScore');
-const Content = require('../config/models/content');
+const tokenize = require('../managers/indexor');
+const levenshtein = require('js-levenshtein');
+const { reverseIndex } = require('../managers/book');
 
 router.get('/fetch', async (req, res) => {
     try {
@@ -18,7 +19,7 @@ router.get('/fetch', async (req, res) => {
 router.get('/reverse', async (req, res) => {
     try {
         const reversedIndexes = await reverseIndex();
-        console.log(typeof(reversedIndexes)); // Doit afficher 'object' si c'est un objet
+        console.log(typeof (reversedIndexes)); // Doit afficher 'object' si c'est un objet
         await Promise.all(Object.entries(reversedIndexes).map(async ([token, books]) => {
             console.log(token, ' : ', books);
             const reverseIndex = new ReverseIndex({ token, books });
@@ -30,6 +31,24 @@ router.get('/reverse', async (req, res) => {
     }
 });
 
+const correctQueries = async (queries) => {
+    const corrections = [];
+    const _indexes = await ReverseIndex.find().exec();
+    for (const query in queries) {
+        let correction = query;
+        let score = -1;
+        for (const index in _indexes) {
+            const newScore = levenshtein(index.token, query);
+            if (score > newScore) {
+                correction = index.token;
+                score = newScore;
+            }
+            corrections.push(correction);
+        }
+    }
+    return corrections;
+}
+
 
 router.get('/search', async (req, res) => {
     let query = req.query.q;
@@ -37,58 +56,50 @@ router.get('/search', async (req, res) => {
         return res.status(400).send({ error: 'Query parameter is missing' });
     }
 
-    const queries = query.toLowerCase().split(" ");
-    let results = []; // Utiliser un tableau pour stocker les résultats directement
+    const queries = tokenize(query.toLowerCase());
+    let result = {
+        tokens: {},
+        data: [],
+    };
+
+    const data = new Set();
 
     try {
-        for (const singleQuery of queries) {
-            const reverseIndexEntry = await ReverseIndex.findOne({ token: singleQuery });
-            if (reverseIndexEntry) {
-                const bookIds = Array.from(reverseIndexEntry.books.keys());
-                const booksData = await Book.find({ '_id': { $in: bookIds } }).exec();
-                
-                // Pour chaque mot-clé, stocker les résultats directement dans le tableau
-                results.push({
-                    token: singleQuery,
-                    books: Object.fromEntries(reverseIndexEntry.books),
-                    data: booksData
-                });
-            } else {
-                // Si aucun résultat n'est trouvé pour un mot-clé, inclure un message d'absence de résultats
-                results.push({
-                    token: singleQuery,
-                    message: 'No results found'
-                });
+        for (const singleQuery of Object.keys(queries)) {
+            console.log(singleQuery);
+            // Remarque : L'opérateur $search nécessite MongoDB Atlas Full-Text Search
+            // Vous devrez remplacer ReverseIndex.find() par ReverseIndex.aggregate() pour utiliser $search
+            const reverseIndexEntries = await ReverseIndex.aggregate([
+                {
+                    $search: {
+                        text: {
+                            query: singleQuery,
+                            path: "token", // Assurez-vous que cela correspond à votre modèle de données
+                            fuzzy: {}
+                        }
+                    },
+                },
+                { $limit: 1 }
+            ]);
+            console.log(reverseIndexEntries);
+
+            for (const entry of reverseIndexEntries) {
+                // Supposons que 'books' est un tableau d'identifiants dans vos documents ReverseIndex
+                const books = entry.books
+                const bookIds = Object.keys(books)
+
+                result.tokens[entry.token] = entry.books
+                console.log(data);
+                bookIds.forEach(id => data.add(id));
             }
         }
-
-        // Envoyer le tableau des résultats
-        res.json(results);
+        result.data = await Book.find({ '_id': { $in: Array.from(data) } });
+        res.json(result);
     } catch (error) {
+        console.error(error);
         res.status(500).send({ error: error.message });
     }
 });
-
-
-
-
-
-router.get('/suggestions', async (req, res) => {
-    const docId = req.query.docId; // L'ID du document pour lequel obtenir des suggestions
-    try {
-        const suggestions = await JaccardScore.findOne({ docId }).exec();
-        const sortedSimilarDocs = suggestions.similarDocs.sort((a, b) => b.score - a.score);
-        const topSimilarDocs = sortedSimilarDocs.slice(1, 6);
-        
-        if (!suggestions) {
-            return res.status(404).send({ message: 'No suggestions found for this document.' });
-        }
-        res.json(topSimilarDocs);
-    } catch (error) {
-        res.status(500).send({ error: error.message });
-    }
-});
-
 
 
 
@@ -112,7 +123,7 @@ router.get('/advanced-search', async (req, res) => {
     }
 
     try {
-        const searchPattern = new RegExp(regex, 'i'); 
+        const searchPattern = new RegExp(regex, 'i');
         const results = await Content.find({ content: { $regex: searchPattern } }).exec();
         const data = await Promise.all(results.map((item) => {
             return Book.findById(item.book).populate({
