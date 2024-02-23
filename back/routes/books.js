@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const Book = require('../config/models/book');
 const ReverseIndex = require('../config/models/reverse_index');
+const { reverseIndex } = require('../managers/book');
 
 router.get('/fetch', async (req, res) => {
     try {
@@ -27,47 +28,6 @@ router.get('/reverse', async (req, res) => {
         res.status(500).send({ error: error.message });
     }
 });
-
-
-router.get('/search', async (req, res) => {
-    let query = req.query.q;
-    if (!query) {
-        return res.status(400).send({ error: 'Query parameter is missing' });
-    }
-
-    const queries = query.toLowerCase().split(" ");
-    let results = []; // Utiliser un tableau pour stocker les résultats directement
-
-    try {
-        for (const singleQuery of queries) {
-            const reverseIndexEntry = await ReverseIndex.findOne({ token: singleQuery });
-            if (reverseIndexEntry) {
-                const bookIds = Array.from(reverseIndexEntry.books.keys());
-                const booksData = await Book.find({ '_id': { $in: bookIds } }).exec();
-                
-                // Pour chaque mot-clé, stocker les résultats directement dans le tableau
-                results.push({
-                    token: singleQuery,
-                    books: Object.fromEntries(reverseIndexEntry.books),
-                    data: booksData
-                });
-            } else {
-                // Si aucun résultat n'est trouvé pour un mot-clé, inclure un message d'absence de résultats
-                results.push({
-                    token: singleQuery,
-                    message: 'No results found'
-                });
-            }
-        }
-
-        // Envoyer le tableau des résultats
-        res.json(results);
-    } catch (error) {
-        res.status(500).send({ error: error.message });
-    }
-});
-
-
 
 
 
