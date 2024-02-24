@@ -11,6 +11,8 @@ import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 import Strings from '../src/constants/strings';
 import { ActivityIndicator } from 'react-native';
 import Colors from '../src/constants/colors';
+import KAuthorSuggestion from '../src/components/AuthorSug';
+import KAuthorSuggestionView from '../src/views/AuthorSug';
 
 
 export default function Search() {
@@ -27,28 +29,41 @@ export default function Search() {
                     ? <StatusBar style="dark" />
                     : <StatusBar style="light" />
                 }
-                <SafeAreaView style={styles.searchZone}>
-                    <KTextInput value={term} onChangeText={setTerm} onSubmitEditing={() => searchStr(term)} />
-                    <KButton title={Strings.search} onPress={() => searchStr(term)} />
-                    {/* <KIconButton name="settings" onPress={() => { }} /> */}
-                </SafeAreaView>
-                {results && <View style={styles.resultZone}>
-                    {isLoadingComplete === false && <ActivityIndicator style={{ flex: 1 }} size="large" color="#fff" />}
-                    {isLoadingComplete === true && results !== null && (
-                        <ScrollView style={styles.resultList}>
-                            {
-                                (results.message !== undefined)
-                                    ? <View style={styles.resultMessage}>
-                                        <Text>{results.message}</Text>
+                <View style={styles.searchContainer}>
+                    <SafeAreaView style={styles.searchZone}>
+                        <KTextInput value={term} onChangeText={setTerm} onSubmitEditing={() => searchStr(term)} />
+                        <KButton title={Strings.search} onPress={() => searchStr(term)} />
+                        {/* <KIconButton name="settings" onPress={() => { }} /> */}
+                    </SafeAreaView>
+                    {results && <View style={styles.resultZone}>
+                        {isLoadingComplete === false && <ActivityIndicator style={{ flex: 1 }} size="large" color="#fff" />}
+                        {isLoadingComplete === true && results !== null && (
+                            <ScrollView style={styles.resultList}>
+                                {
+                                    results.tokens &&
+                                    <View style={styles.resultMessage}>
+                                        {Object.keys(results.tokens).map((token, i) => (
+                                            <Text key={i}>{token}</Text>
+                                        ))}
                                     </View>
-                                    : (results.data ?? []).map((book, i) => (
-                                        <View key={i} style={styles.resultItem}>
-                                            <KSearchResult book={book} />
+                                }
+                                {
+                                    (results.message !== undefined)
+                                        ? <View style={styles.resultMessage}>
+                                            <Text>{results.message}</Text>
                                         </View>
-                                    ))
-                            }
-                        </ScrollView>
-                    )}
+                                        : (results.data ?? []).map((book, i) => (
+                                            <View key={i} style={styles.resultItem}>
+                                                <KSearchResult book={book} />
+                                            </View>
+                                        ))
+                                }
+                            </ScrollView>
+                        )}
+                    </View>}
+                </View>
+                {results?.data && <View style={styles.sugContainer}>
+                    <KAuthorSuggestionView term={term} />
                 </View>}
             </View>
         </SafeAreaProvider>
@@ -58,29 +73,33 @@ export default function Search() {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        alignItems: 'center',
-        justifyContent: 'center',
+        flexDirection: 'row',
         backgroundColor: Colors.light.background,
     },
+    sugContainer: {
+        padding: Physics.padding.large,
+    },
+    searchContainer: {
+        flexGrow: 1,
+        flexDirection: 'column',
+        alignItems: 'center',
+        justifyContent: 'center',
+    },
     searchZone: {
-        padding: Physics.padding.medium,
+        padding: Physics.padding.large,
         gap: Physics.gap.medium,
         width: '100%',
-        maxWidth: 700,
-        // backgroundColor: Colors.light.primary,
         flexDirection: 'row',
-        // flexWrap: 'wrap',
+        maxWidth: 700,
     },
     resultZone: {
         flex: 1,
+        // maxWidth: '100%',
     },
     resultList: {
         flex: 1,
         gap: Physics.gap.large,
-        paddingLeft: Physics.padding.medium,
-        paddingRight: Physics.padding.medium,
-        paddingTop: Physics.padding.medium,
-        maxWidth: 700,
+        paddingHorizontal: Physics.padding.small,
     },
     resultItem: {
         paddingBottom: Physics.padding.medium,

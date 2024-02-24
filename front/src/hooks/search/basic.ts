@@ -5,18 +5,22 @@ import { Book } from "../../models/book";
 type SearchResults = {
   message?: string;
   error?: string;
-  token?: string;
-  books?: Map<string, number>;
+  tokens?: {
+    [key: string]: {
+      [key: string]: number;
+    };
+  };
   data?: Array<Book>;
 };
 
 export function useSearch() {
   const [results, setResults] = React.useState<SearchResults | null>(null);
-  const [isLoadingComplete, setLoadingComplete] =
-    React.useState<Boolean | null>(null);
+  const [isSearchComplete, setSearchComplete] = React.useState<Boolean | null>(
+    null
+  );
 
   const searchStr = async (term: String) => {
-    setLoadingComplete(false);
+    setSearchComplete(false);
     // fetch data from api
     try {
       const url = Strings.apiSearch + "?q=" + term;
@@ -32,15 +36,15 @@ export function useSearch() {
       // console.log("response: ", response);
       const results: SearchResults = await response.json();
       // const results: SearchResults = { data: await response.json() };
-      // console.log("results: ", data);
+      console.log("results: ", results);
       console.log(results.data?.length, " results found");
-      setLoadingComplete(true);
+      setSearchComplete(true);
       setResults(results);
     } catch (error) {
       console.error("Error fetching data: ", error);
-      setLoadingComplete(true);
+      setSearchComplete(true);
     }
   };
 
-  return [isLoadingComplete, results, searchStr] as const;
+  return [isSearchComplete, results, searchStr] as const;
 }
