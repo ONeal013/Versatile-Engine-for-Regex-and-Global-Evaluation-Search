@@ -8,12 +8,20 @@
 #Test Search
 #http://localhost:3000/books/search?q=twins
 
-#Test suggestion 1 : cacluler les scores de jaccard et les mettre dans la mongodb
-#C:\Users\anil0\Desktop\TheVergeProject\back\managers> node calculateJaccardScores.js
 
 
-#Test suggestion 2 
-#http://localhost:3000/books/suggestions?docId=65d380672049989199cd873b
+#Test suggestion avec id 
+# http://localhost:3000/suggestions/65d380652049989199cd8738
+
+
+#Test suggestion poir tous les livres 
+# http://localhost:3000/suggestions
 
 # github
 https://github.com/ONeal013/The-Verges
+
+
+
+
+#OBSOLETE : 24/02/2024 Test suggestion 1 : cacluler les scores de jaccard et les mettre dans la mongodb
+#C:\Users\anil0\Desktop\TheVergeProject\back\managers> node calculateJaccardScores.js
