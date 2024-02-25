@@ -1,9 +1,7 @@
 // helpers/dataHelpers.js
 const JaccardScore = require('../models/jaccardScore'); // Assurez-vous que ce chemin correspond à votre structure de projet
 const Index = require('../models/index'); // Assurez-vous que ce chemin correspond à votre structure de projet
-
-
-
+const Book = require('../models/book');
 
 
 async function getJaccardScores(documentIds) {
@@ -33,11 +31,7 @@ async function getJaccardScores(documentIds) {
 
 
 
-/**
- * Récupère les occurrences de tokens pour un livre spécifique.
- * @param {String} bookId - L'identifiant du livre pour lequel récupérer les occurrences de tokens.
- * @returns {Promise<Object>} Un objet contenant les tokens et leurs occurrences pour le livre donné.
- */
+
 async function getTokenOccurrences(bookId) {
     try {
         const indexEntry = await Index.findOne({ book: bookId });
@@ -54,4 +48,17 @@ async function getTokenOccurrences(bookId) {
     }
 }
 
-module.exports = { getJaccardScores, getTokenOccurrences };
+async function getAllBookIds() {
+    try {
+        const books = await Book.find({}, '_id'); // Sélectionne uniquement le champ _id
+        return books.map(book => book._id.toString()); // Convertit les ObjectId en chaînes de caractères
+    } catch (error) {
+        console.error("Erreur lors de la récupération des identifiants des livres:", error);
+        return []; // Retourne un tableau vide en cas d'erreur
+    }
+}
+
+module.exports = { getJaccardScores, getTokenOccurrences, getAllBookIds};
+
+
+

@@ -27,5 +27,3 @@ app.use('/suggestions', suggestionsRouter);
 app.listen(port, () => {
   console.log(`Example app listening on port ${port}`)
 })
-
-
