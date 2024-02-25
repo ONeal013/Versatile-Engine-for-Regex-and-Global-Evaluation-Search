@@ -2,7 +2,8 @@ const express = require('express');
 const router = express.Router();
 const calculateJaccardScore = require('../managers/suggestion');
 const Book = require('../config/models/book');
-const { getPageRankScores } = require('../managers/pageRank'); // Assurez-vous du chemin
+const getPageRankScores = require('../managers/pageRank'); 
+// Assurez-vous du chemin
 
 router.get('/', async (req, res) => {
     try {
@@ -22,6 +23,19 @@ router.get('/', async (req, res) => {
 });
 
 
+router.get('/ranked', async (req, res) => {
+    try {
+        const pageRankScores = await getPageRankScores();
+        // Logique pour appliquer les scores de PageRank à vos suggestions
+        // Cette partie dépend de comment vous souhaitez utiliser les scores de PageRank pour ajuster vos suggestions
+        res.json(pageRankScores);
+    } catch (error) {
+        res.status(500).send({ error: error.message });
+    }
+});
+
+
+
 router.get('/:bookId', async (req, res) => {
     try {
         const bookId = req.params.bookId;
@@ -33,15 +47,5 @@ router.get('/:bookId', async (req, res) => {
 });
 
 
-router.get('/ranked', async (req, res) => {
-    try {
-        const pageRankScores = await getPageRankScores();
-        // Logique pour appliquer les scores de PageRank à vos suggestions
-        // Cette partie dépend de comment vous souhaitez utiliser les scores de PageRank pour ajuster vos suggestions
-        res.json(pageRankScores);
-    } catch (error) {
-        res.status(500).send({ error: error.message });
-    }
-});
 
 module.exports = router;
