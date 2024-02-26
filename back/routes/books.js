@@ -67,10 +67,14 @@ router.get('/search', async (req, res) => {
     };
 
     const data = new Set();
+    const weights = {};
 
     try {
         for (const singleQuery of Object.keys(queries)) {
             console.log(singleQuery);
+             
+            const tokenWeight = 1 / (Object.keys(queries).indexOf(singleQuery) + 1);
+            
             const reverseIndexEntries = await ReverseIndex.aggregate([
                 {
                     $search: {
@@ -88,6 +92,13 @@ router.get('/search', async (req, res) => {
                 const books = entry.books
                 const bookIds = Object.keys(books)
 
+                Object.entries(books).forEach(([bookId, occurrence]) => {
+                    if (!weights[bookId]) {
+                        weights[bookId] = 0;
+                    }
+                    weights[bookId] += occurrence * tokenWeight;
+                });
+
                 result.tokens[entry.token] = entry.books
                 console.log(data);
                 bookIds.forEach(id => data.add(id));
@@ -95,12 +106,19 @@ router.get('/search', async (req, res) => {
         }
 
         // Maintenant, récupérez les livres par _id et triez-les par page_rank_score en ordre décroissant
-        result.data = await Book.find({ '_id': { $in: Array.from(data) } })
+        const books = await Book.find({ '_id': { $in: Array.from(data) } })
                                 .sort({ page_rank_score: -1 }) // Ajoutez cette ligne pour trier par page_rank_score
                                 .populate('authors')
                                 .populate('translators')
+                                .lean()
                                 .exec(); // Exécutez la requête
 
+        books.sort((a, b) => {
+            const weightA = weights[a._id.toString()] || 0;
+            const weightB = weights[b._id.toString()] || 0;
+            return (b.page_rank_score * weightB) - (a.page_rank_score * weightA);
+        });
+        result.data = books
         res.json(result);
     } catch (error) {
         //console.error(error);
