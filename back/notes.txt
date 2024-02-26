@@ -12,7 +12,7 @@
 http://localhost:3000/books/advanced-search/regex=
 
 #Test suggestion avec id 
-# http://localhost:3000/suggestions/65d380652049989199cd8738
+# http://localhost:3000/suggestions/65dc89b3c42151114cd7551c
 
 
 #Test suggestion poir tous les livres 
