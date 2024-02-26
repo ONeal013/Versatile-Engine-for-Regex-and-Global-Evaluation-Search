@@ -13,7 +13,7 @@ export default function KAuthorSuggestionView(props: Props) {
 
     return (
         <View style={styles.container}>
-            <ScrollView>
+            <ScrollView style={styles.scroller} horizontal={true}>
                 {suggestions && suggestions.map((author, index) => {
                     return (
                         <View style={styles.sug} key={index}>
@@ -31,16 +31,18 @@ export default function KAuthorSuggestionView(props: Props) {
 
 const styles = StyleSheet.create({
     container: {
-        flex: 1,
-        // width: '100%',
+        width: '100%',
         flexDirection: 'column',
-        alignItems: 'center',
         // justifyContent: 'center',
-        backgroundColor: Colors.light.canvas,
-        padding: Physics.padding.large,
+        // backgroundColor: Colors.light.canvas,
         borderRadius: Physics.borderRadius.medium,
+        overflow: 'hidden',
+    },
+    scroller: {
+        padding: Physics.padding.medium,
     },
     sug: {
-        paddingBottom: Physics.padding.medium,
+        // paddingBottom: Physics.padding.medium,
+        paddingRight: Physics.padding.medium,
     },
 });

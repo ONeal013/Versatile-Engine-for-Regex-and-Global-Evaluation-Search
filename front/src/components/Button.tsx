@@ -25,7 +25,7 @@ export default function KButton(props: Props) {
 const styles = StyleSheet.create({
   background: {
     paddingVertical: Physics.padding.medium,
-    paddingHorizontal: Physics.padding.large,
+    paddingHorizontal: Physics.padding.large * 2,
     borderRadius: Physics.borderRadius.medium,
     ...Physics.shadow,
     elevation: Physics.elevation.medium,

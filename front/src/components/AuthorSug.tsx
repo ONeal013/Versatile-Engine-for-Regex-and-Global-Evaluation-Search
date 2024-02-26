@@ -19,8 +19,15 @@ export default function KAuthorSuggestion(props: Props) {
             </View>
             <View style={styles.container}>
                 <View>
-                    <Text style={styles.title}>{author.name}</Text>
+                    <Text numberOfLines={2} style={styles.title}>{author.name}</Text>
                 </View>
+                {(author.birth_year || author.death_year) && <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: Physics.gap.small }}>
+                    <Text>{author.birth_year}</Text>
+                    {author.birth_year && <Text>-</Text>}
+                    <Text>{author.death_year}</Text>
+                </View>}
+            </View>
+            {/* 
                 <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: Physics.gap.medium }}>
                     <View style={{ flexDirection: 'row', flexWrap: 'wrap' }}>
                         <Text>{Strings.birthYear}: </Text>
@@ -30,30 +37,32 @@ export default function KAuthorSuggestion(props: Props) {
                         <Text>{Strings.deathYear}: </Text>
                         <Text>{author.death_year}</Text>
                     </View>
-                </View>
-            </View>
+                </View> */}
         </Pressable >
     );
 }
 
 const styles = StyleSheet.create({
     wrapper: {
-        padding: Physics.padding.medium,
+        padding: Physics.padding.small,
         gap: Physics.gap.large,
-        width: '100%',
-        flexDirection: 'row',
-        alignItems: 'center',
+        width: 125,
+        height: 200,
+        flexDirection: 'column',
         color: Colors.light.textInput.background ?? Colors.light.text ?? '#fff',
-        borderRadius: Physics.borderRadius.medium,
-        backgroundColor: Colors.light.background,
-    },
-    leading: {
-        paddingVertical: Physics.padding.medium,
-        paddingHorizontal: Physics.padding.large,
         borderRadius: Physics.borderRadius.medium,
         backgroundColor: Colors.light.canvas,
     },
+    leading: {
+        flex: 2,
+        borderRadius: Physics.borderRadius.medium,
+        backgroundColor: Colors.light.background,
+        alignItems: 'center',
+        justifyContent: 'center',
+        width: '100%',
+    },
     container: {
+        flex: 1,
         fontSize: Physics.text.body.medium,
         fontWeight: 'bold',
         flexDirection: 'column',
