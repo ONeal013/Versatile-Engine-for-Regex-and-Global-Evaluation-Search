@@ -22,9 +22,9 @@ router.get('/fetch', async (req, res) => {
 router.get('/reverse', async (req, res) => {
     try {
         const reversedIndexes = await reverseIndex();
-        console.log(typeof (reversedIndexes)); // Doit afficher 'object' si c'est un objet
+        // console.log(typeof (reversedIndexes)); // Doit afficher 'object' si c'est un objet
         await Promise.all(Object.entries(reversedIndexes).map(async ([token, books]) => {
-            console.log(token, ' : ', books);
+            // console.log(token, ' : ', books);
             const reverseIndex = new ReverseIndex({ token, books });
             await reverseIndex.save();
         }));
@@ -61,6 +61,7 @@ router.get('/search', async (req, res) => {
 
     const queries = tokenize(query.toLowerCase());
     let result = {
+        typos: {},
         tokens: {},
         data: [],
     };

@@ -1,5 +1,13 @@
 # The Versatile Engine for Regex and Global Evaluation Search
 
+lancer dans cet ordre
+
+1. fetch
+2. reverse
+3. suggestion
+4. ranked 
+
+
 # https://cloud.mongodb.com/v2/65ca3c8254533720612e2ffd#/metrics/replicaSet/65ca3cc456131b58b05ce2c8/explorer/test/bookcontents/find
 
 #Test Fetch

@@ -5,7 +5,7 @@ const Book = require('../config/models/book');
 const getPageRankScores = require('../managers/pageRank'); 
 const JaccardScore = require('../config/models/jaccardScore');
 const { ObjectId } = require('mongodb');
-// Assurez-vous du chemin
+
 
 router.get('/', async (req, res) => {
     try {
