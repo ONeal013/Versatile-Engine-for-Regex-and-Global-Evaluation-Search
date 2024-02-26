@@ -22,7 +22,7 @@ router.get('/fetch', async (req, res) => {
 router.get('/reverse', async (req, res) => {
     try {
         const reversedIndexes = await reverseIndex();
-        console.log(typeof(reversedIndexes)); // Doit afficher 'object' si c'est un objet
+        console.log(typeof (reversedIndexes)); // Doit afficher 'object' si c'est un objet
         await Promise.all(Object.entries(reversedIndexes).map(async ([token, books]) => {
             console.log(token, ' : ', books);
             const reverseIndex = new ReverseIndex({ token, books });
@@ -79,7 +79,7 @@ router.get('/search', async (req, res) => {
                             fuzzy: {}
                         }
                     },
-                }, 
+                },
                 { $limit: 1 }
             ]);
 
@@ -127,7 +127,7 @@ router.get('/advanced-search', async (req, res) => {
     }
 
     try {
-        const searchPattern = new RegExp(regex, 'i'); 
+        const searchPattern = new RegExp(regex, 'i');
         const results = await Content.find({ content: { $regex: searchPattern } }).exec();
         const data = await Promise.all(results.map((item) => {
             return Book.findById(item.book).populate({
