@@ -2,15 +2,14 @@ const Graph = require('graphology');
 const pagerank = require('graphology-metrics/centrality/pagerank');
 const { getJaccardScores } = require('../config/helpers/dataHelper');
 const { getAllBookIds} = require('../config/helpers/dataHelper');
+const Book = require('../config/models/book'); // Assurez-vous que ce chemin est correct
 
 
 async function getPageRankScores() {
     const graph = new Graph();
-    // Supposons que vous ayez une fonction pour obtenir tous les ID des livres
-    const allBookIds = await getAllBookIds(); // Implémentez cette fonction selon votre modèle
+    const allBookIds = await getAllBookIds();
     const jaccardScores = await getJaccardScores(allBookIds);
 
-    // Construire le graphe
     allBookIds.forEach(id => graph.addNode(id));
     jaccardScores.forEach(({ doc1, doc2, similarity }) => {
         if (!graph.hasEdge(doc1, doc2)) {
@@ -18,13 +17,19 @@ async function getPageRankScores() {
         }
     });
 
-    // Calculer le PageRank
     const scores = pagerank(graph);
-    return scores;
+
+    // Mise à jour des documents de livre avec leurs scores de PageRank
+    for (const bookId in scores) {
+        await Book.findByIdAndUpdate(bookId, { $set: { page_rank_score: scores[bookId] } });
+    }
+
+    console.log('PageRank scores updated in the database.');
 }
 
-
 module.exports = getPageRankScores;
+
+
 
 
 
