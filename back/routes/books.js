@@ -4,7 +4,10 @@ const Book = require('../config/models/book');
 const ReverseIndex = require('../config/models/reverse_index');
 const tokenize = require('../managers/indexor');
 const levenshtein = require('js-levenshtein');
-const { reverseIndex } = require('../managers/book');
+const { reverseIndex, fetchAndStoreBooks } = require('../managers/book');
+const { getPageRankScores } = require('../managers/pageRank');
+
+
 
 router.get('/fetch', async (req, res) => {
     try {
@@ -67,8 +70,6 @@ router.get('/search', async (req, res) => {
     try {
         for (const singleQuery of Object.keys(queries)) {
             console.log(singleQuery);
-            // Remarque : L'opérateur $search nécessite MongoDB Atlas Full-Text Search
-            // Vous devrez remplacer ReverseIndex.find() par ReverseIndex.aggregate() pour utiliser $search
             const reverseIndexEntries = await ReverseIndex.aggregate([
                 {
                     $search: {
@@ -81,10 +82,8 @@ router.get('/search', async (req, res) => {
                 },
                 { $limit: 1 }
             ]);
-            console.log(reverseIndexEntries);
 
             for (const entry of reverseIndexEntries) {
-                // Supposons que 'books' est un tableau d'identifiants dans vos documents ReverseIndex
                 const books = entry.books
                 const bookIds = Object.keys(books)
 
@@ -93,10 +92,15 @@ router.get('/search', async (req, res) => {
                 bookIds.forEach(id => data.add(id));
             }
         }
-        result.data = await Book.find({ '_id': { $in: Array.from(data) } });
+
+        // Maintenant, récupérez les livres par _id et triez-les par page_rank_score en ordre décroissant
+        result.data = await Book.find({ '_id': { $in: Array.from(data) } })
+                                .sort({ page_rank_score: -1 }) // Ajoutez cette ligne pour trier par page_rank_score
+                                .exec(); // Exécutez la requête
+
         res.json(result);
     } catch (error) {
-        console.error(error);
+        //console.error(error);
         res.status(500).send({ error: error.message });
     }
 });
