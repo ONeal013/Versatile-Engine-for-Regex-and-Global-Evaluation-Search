@@ -96,6 +96,8 @@ router.get('/search', async (req, res) => {
         // Maintenant, récupérez les livres par _id et triez-les par page_rank_score en ordre décroissant
         result.data = await Book.find({ '_id': { $in: Array.from(data) } })
                                 .sort({ page_rank_score: -1 }) // Ajoutez cette ligne pour trier par page_rank_score
+                                .populate('authors')
+                                .populate('translators')
                                 .exec(); // Exécutez la requête
 
         res.json(result);
