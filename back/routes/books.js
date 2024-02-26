@@ -5,6 +5,7 @@ const ReverseIndex = require('../config/models/reverse_index');
 const tokenize = require('../managers/indexor');
 const levenshtein = require('js-levenshtein');
 const { reverseIndex } = require('../managers/book');
+const { getPageRankScores } = require('../managers/pageRank');
 
 router.get('/fetch', async (req, res) => {
     try {
@@ -81,7 +82,7 @@ router.get('/search', async (req, res) => {
                 }, 
                 { $limit: 1 }
             ]);
-            console.log(reverseIndexEntries);
+            // console.log(reverseIndexEntries);
 
             for (const entry of reverseIndexEntries) {
                 // Supposons que 'books' est un tableau d'identifiants dans vos documents ReverseIndex
@@ -96,7 +97,7 @@ router.get('/search', async (req, res) => {
         result.data = await Book.find({ '_id': { $in: Array.from(data) } });
         res.json(result);
     } catch (error) {
-        console.error(error);
+        //console.error(error);
         res.status(500).send({ error: error.message });
     }
 });

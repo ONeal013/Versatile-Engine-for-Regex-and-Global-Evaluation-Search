@@ -6,9 +6,10 @@
 # http://localhost:3000/book/fetch
 
 #Test Search
-#http://localhost:3000/books/search?q=twins
+# http://localhost:3000/books/search?q=twins
 
-
+# test Regex 
+http://localhost:3000/books/advanced-search/regex=
 
 #Test suggestion avec id 
 # http://localhost:3000/suggestions/65d380652049989199cd8738
@@ -20,6 +21,8 @@
 # github
 https://github.com/ONeal013/The-Verges
 
+# Fonction de classement 
+http://localhost:3000/suggestions/ranked
 
 
 
