@@ -22,9 +22,9 @@ router.get('/fetch', async (req, res) => {
 router.get('/reverse', async (req, res) => {
     try {
         const reversedIndexes = await reverseIndex();
-        console.log(typeof (reversedIndexes)); // Doit afficher 'object' si c'est un objet
+        // console.log(typeof (reversedIndexes)); // Doit afficher 'object' si c'est un objet
         await Promise.all(Object.entries(reversedIndexes).map(async ([token, books]) => {
-            console.log(token, ' : ', books);
+            // console.log(token, ' : ', books);
             const reverseIndex = new ReverseIndex({ token, books });
             await reverseIndex.save();
         }));
@@ -55,21 +55,30 @@ const correctQueries = async (queries) => {
 
 router.get('/search', async (req, res) => {
     let query = req.query.q;
+    // Paramètres de pagination avec des valeurs par défaut
+    const page = parseInt(req.query.page, 10) || 1;
+    const limit = parseInt(req.query.limit, 10) || 15;
+
     if (!query) {
         return res.status(400).send({ error: 'Query parameter is missing' });
     }
 
     const queries = tokenize(query.toLowerCase());
     let result = {
+        typos: {},
         tokens: {},
         data: [],
     };
 
     const data = new Set();
+    const weights = {};
 
     try {
         for (const singleQuery of Object.keys(queries)) {
             console.log(singleQuery);
+             
+            const tokenWeight = 1 / (Object.keys(queries).indexOf(singleQuery) + 1);
+            
             const reverseIndexEntries = await ReverseIndex.aggregate([
                 {
                     $search: {
@@ -87,23 +96,45 @@ router.get('/search', async (req, res) => {
                 const books = entry.books
                 const bookIds = Object.keys(books)
 
+                Object.entries(books).forEach(([bookId, occurrence]) => {
+                    if (!weights[bookId]) {
+                        weights[bookId] = 0;
+                    }
+                    weights[bookId] += occurrence * tokenWeight;
+                });
+
                 result.tokens[entry.token] = entry.books
                 console.log(data);
                 bookIds.forEach(id => data.add(id));
             }
         }
 
-        // Maintenant, récupérez les livres par _id et triez-les par page_rank_score en ordre décroissant
-        result.data = await Book.find({ '_id': { $in: Array.from(data) } })
-                                .sort({ page_rank_score: -1 }) // Ajoutez cette ligne pour trier par page_rank_score
-                                .exec(); // Exécutez la requête
+        // Récupérez les livres par _id et triez-les par page_rank_score en ordre décroissant
+        // Appliquez la pagination ici
+        const books = Book.find({ '_id': { $in: Array.from(data) } })
+                               .sort({ page_rank_score: -1 }) // Tri par page_rank_score
+                               .populate('authors')
+                               .populate('translators')
+                               .lean();
 
+        // Calcul de l'offset basé sur la page et la limite
+        const offset = (page - 1) * limit;
+        const paginatedBooks = await books.skip(offset).limit(limit);
+
+        // Triez les livres paginés en fonction des poids calculés
+        paginatedBooks.sort((a, b) => {
+            const weightA = weights[a._id.toString()] || 0;
+            const weightB = weights[b._id.toString()] || 0;
+            return (b.page_rank_score * weightB) - (a.page_rank_score * weightA);
+        });
+
+        result.data = paginatedBooks;
         res.json(result);
     } catch (error) {
-        //console.error(error);
         res.status(500).send({ error: error.message });
     }
 });
+
 
 
 

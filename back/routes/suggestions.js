@@ -3,7 +3,9 @@ const router = express.Router();
 const calculateJaccardScore = require('../managers/suggestion');
 const Book = require('../config/models/book');
 const getPageRankScores = require('../managers/pageRank'); 
-// Assurez-vous du chemin
+const JaccardScore = require('../config/models/jaccardScore');
+const { ObjectId } = require('mongodb');
+
 
 router.get('/', async (req, res) => {
     try {
@@ -39,7 +41,15 @@ router.get('/ranked', async (req, res) => {
 router.get('/:bookId', async (req, res) => {
     try {
         const bookId = req.params.bookId;
-        const suggestions = await calculateJaccardScore(bookId);
+    const suggestions = await JaccardScore.findOne({docId: new ObjectId(bookId)})
+    .populate('docId')
+    .populate({
+        path: 'similarDocs', 
+        populate: { 
+            path: 'docId'
+        }
+    })
+    .exec();
         res.json(suggestions);
     } catch (error) {
         res.status(500).send({ error: error.message });

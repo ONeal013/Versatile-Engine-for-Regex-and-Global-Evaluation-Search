@@ -19,32 +19,42 @@ function cleanKeys(tokens) {
 async function fetchAndStoreBooks() {
     try {
         // Récupérer les 10 premiers livres de Gutenberg
-        const response = await axios.get('https://gutendex.com/books?ids=84,85,86,87,88,89,90,91,92,93');
+        const response = await axios.get('https://gutendex.com/books/');
         const books = response.data.results;
 
         for (const book of books) {
             // Gérer les auteurs
-            const authorIds = await Promise.all(book.authors.map(async (authorData) => {
+            const authors = await Promise.all(book.authors.map(async (authorData) => {
                 let author = await Author.findOne({ name: authorData.name });
                 if (!author) {
                     author = new Author(authorData);
                     await author.save();
                 }
-                return author._id;
+                return author;
+            }));
+            // Gérer les traducteurs
+            const translators = await Promise.all(book.translators.map(async (translatorData) => {
+                let translator = await Author.findOne({ name: translatorData.name });
+                if (!translator) {
+                    translator = new Author(translatorData);
+                    await translator.save();
+                }
+                return translator;
             }));
 
             // Créer et sauvegarder le nouveau livre
             const newBook = new Book({
                 ...book,
-                authors: authorIds,
-                // Supposons que les traducteurs doivent être ajoutés, ajuster ici
+                authors,
+                translators,
             });
             await newBook.save();
             console.log(`Livre "${newBook.title}" ajouté à la base de données.`);
 
             // Vérifier si le format de contenu textuel est disponible pour le livre
-            if (newBook.formats['text/plain; charset=us-ascii']) {
-                const contentResponse = await axios.get(newBook.formats['text/plain; charset=us-ascii']);
+            const text = newBook.formats['text/plain; charset=us-ascii'] ?? newBook.formats['text/plain; charset=utf-8']
+            if (text) {
+                const contentResponse = await axios.get(text);
                 const content = contentResponse.data;
 
                 // Sauvegarder le contenu du livre

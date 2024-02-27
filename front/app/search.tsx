@@ -13,6 +13,7 @@ import { ActivityIndicator } from 'react-native';
 import Colors from '../src/constants/colors';
 import KAuthorSuggestionView from '../src/views/AuthorSug';
 import KBackground from '../src/components/Background';
+import KBookSuggestionView from '../src/views/BookSug';
 
 
 export default function Search() {
@@ -52,19 +53,22 @@ export default function Search() {
                         </View>}
                         {isLoadingComplete === false && <ActivityIndicator style={{ flex: 1 }} size="large" color="#fff" />}
                         {isLoadingComplete === true && results !== null && (
-                            <ScrollView style={styles.resultList} showsVerticalScrollIndicator={false}>
-                                {
-                                    (results.message !== undefined)
-                                        ? <View style={styles.resultMessage}>
-                                            <Text>{results.message}</Text>
-                                        </View>
-                                        : (results.data ?? []).map((book, i) => (
-                                            <View key={i} style={styles.resultItem}>
-                                                <KSearchResult book={book} />
+                            <View style={{ flexDirection: 'row' }}>
+                                <ScrollView style={styles.resultList} showsVerticalScrollIndicator={false}>
+                                    {
+                                        (results.message !== undefined)
+                                            ? <View style={styles.resultMessage}>
+                                                <Text>{results.message}</Text>
                                             </View>
-                                        ))
-                                }
-                            </ScrollView>
+                                            : (results.data ?? []).map((book, i) => (
+                                                <View key={i} style={styles.resultItem}>
+                                                    <KSearchResult book={book} />
+                                                </View>
+                                            ))
+                                    }
+                                </ScrollView>
+                                {results.data && <KBookSuggestionView book={results.data[0]} />}
+                            </View>
                         )}
                     </ScrollView>
                 </View>}
@@ -133,7 +137,7 @@ const styles = StyleSheet.create({
     },
     sugContainer: {
         // flex: 1,
-        padding: Physics.padding.small,
+        // padding: Physics.padding.small,
     },
     searchContainer: {
         flexDirection: 'column',
@@ -157,7 +161,6 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         justifyContent: 'center',
         gap: Physics.gap.medium,
-        paddingBottom: Physics.padding.medium,
     },
     resultList: {
         gap: Physics.gap.large,
@@ -168,7 +171,8 @@ const styles = StyleSheet.create({
         paddingBottom: Physics.padding.medium,
     },
     resultTokens: {
-        padding: Physics.padding.small,
+        paddingVertical: Physics.padding.small,
+        paddingHorizontal: Physics.padding.large,
         borderRadius: Physics.borderRadius.medium,
         backgroundColor: Colors.light.canvas,
         flexDirection: 'row',
