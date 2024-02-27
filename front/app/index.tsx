@@ -1,13 +1,10 @@
 import { StatusBar } from 'expo-status-bar';
 import { StyleSheet, View, Text, Pressable } from 'react-native';
 import * as NavigationBar from 'expo-navigation-bar';
-import KBackground from '../src/components/background';
-import KTextInput from '../src/components/TextInput';
-import KButton from '../src/components/Button';
+import KBackground from '../src/components/Background';
 import Physics from '../src/constants/physics';
 import React from 'react';
 import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
-import Strings from '../src/constants/strings';
 import { Link } from 'expo-router';
 import Colors from '../src/constants/colors';
 

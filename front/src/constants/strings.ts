@@ -6,8 +6,8 @@ const Strings = {
   apiSearch: apiBaseUrl + "books/search",
   apiAuthors: apiBaseUrl + "authors/",
   apiSugBook: apiBaseUrl + "suggestions/",
-  apiBookCover_: (id: number) =>
-    `https://www.gutenberg.org/cache/epub/${id}/pg${id}.cover.medium.jpg`,
+  apiBookCover_: (id: number, size: "small" | "medium" = "medium") =>
+    `https://www.gutenberg.org/cache/epub/${id}/pg${id}.cover.${size}.jpg`,
 
   authors: "Authors",
   subjects: "Subjects",

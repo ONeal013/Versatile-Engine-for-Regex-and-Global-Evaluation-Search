@@ -1,4 +1,4 @@
-import { Pressable, StyleSheet, Text, View, Image } from 'react-native';
+import { Pressable, StyleSheet, Text, View, Image, ScrollView } from 'react-native';
 import Colors from '../constants/colors';
 import Physics from '../constants/physics';
 import { Book } from '../models/book';
@@ -15,14 +15,14 @@ export default function KSearchResult(props: Props) {
     return (
         <Pressable style={styles.wrapper} onPress={props.onPress}>
             <View style={styles.leading}>
-                <Image source={{ uri: Strings.apiBookCover_(book.id) }} style={{ flex: 1, width: 50, height: 100 }} />
+                <Image source={{ uri: Strings.apiBookCover_(book.id) }} style={{ flex: 1 }} />
                 {/* <Ionicons name="book" size={Physics.icon.large} color={Colors.light.primaryDark} /> */}
             </View>
             <View style={styles.container}>
                 <View>
                     <Text style={styles.title}>{book.title}</Text>
                 </View>
-                <View style={{ flexDirection: 'row', flexWrap: 'wrap' }}>
+                {/* <View style={{ flexDirection: 'row', flexWrap: 'wrap' }}>
                     <Text>{Strings.authors}: </Text>
                     <View style={styles.subtitleContainer}>
                         {book.authors.length > 1
@@ -32,19 +32,58 @@ export default function KSearchResult(props: Props) {
                             : <Text style={styles.subtitle}>{Strings.unknown}</Text>
                         }
                     </View>
-                </View>
+                </View> */}
                 <View style={styles.bottomContainer}>
                     <Text>Subjects: </Text>
                     <Text style={{ ...styles.subtitle, maxWidth: '85%' }} numberOfLines={1}>
                         {book.subjects.slice(0, 2).map((subject, i) => subject)}
                     </Text>
                 </View>
+                <ScrollView horizontal={true}>
+                    {book.authors && book.authors.map((author, i) => (
+                        <View key={i} style={styles.authorWrapper}>
+                            <View style={styles.authorLeading}>
+                                <Ionicons name="person" size={Physics.icon.medium} color={Colors.light.primaryDark} />
+                            </View>
+                            <View style={styles.container}>
+                                <View>
+                                    <Text numberOfLines={2} style={styles.authorTitle}>{author.name}</Text>
+                                </View>
+                                {(author.birth_year || author.death_year) && <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: Physics.gap.small }}>
+                                    <Text>{author.birth_year}</Text>
+                                    {author.birth_year && <Text>-</Text>}
+                                    <Text>{author.death_year}</Text>
+                                </View>}
+                            </View>
+                        </View >
+                    ))}
+                </ScrollView>
             </View>
         </Pressable >
     );
 }
 
 const styles = StyleSheet.create({
+    authorWrapper: {
+        flexDirection: 'row',
+        gap: Physics.gap.small,
+        padding: Physics.padding.small,
+        borderRadius: Physics.borderRadius.medium,
+        borderWidth: Physics.borderWidth.small,
+        borderColor: Colors.light.background,
+        marginRight: Physics.gap.medium,
+    },
+    authorLeading: {
+        padding: Physics.padding.small,
+        borderRadius: Physics.borderRadius.medium,
+        borderWidth: Physics.borderWidth.small,
+        borderColor: Colors.light.background,
+        backgroundColor: Colors.light.background,
+        overflow: 'hidden',
+    },
+    authorTitle: {
+        fontWeight: 'bold',
+    },
     wrapper: {
         padding: Physics.padding.medium,
         gap: Physics.gap.large,
@@ -56,19 +95,27 @@ const styles = StyleSheet.create({
         backgroundColor: Colors.light.canvas,
     },
     leading: {
-        paddingVertical: Physics.padding.medium,
-        paddingHorizontal: Physics.padding.large,
-        borderRadius: Physics.borderRadius.medium,
+        // flex: 1,
+        width: 80,
+        aspectRatio: Physics.aspectRatio.bookCover,
+        // paddingVertical: Physics.padding.medium,
+        // paddingHorizontal: Physics.padding.large,
+        borderRadius: Physics.borderRadius.small,
+        borderWidth: Physics.borderWidth.small,
+        borderColor: Colors.light.background,
         backgroundColor: Colors.light.background,
+        overflow: 'hidden',
     },
     container: {
-        flexGrow: 1,
+        flex: 4,
         fontSize: Physics.text.body.medium,
         fontWeight: 'bold',
         flexDirection: 'column',
+        gap: Physics.gap.small,
     },
     title: {
         fontWeight: 'bold',
+        fontSize: Physics.text.title.small,
     },
     subtitle: {
         fontSize: Physics.text.body.medium,
