@@ -2,6 +2,9 @@ const express = require('express');
 const router = express.Router();
 const Author = require('../config/models/author');
 const stopWords = require('../stop_words_english.json') + Array.from({ length: 100 }, (_, i) => i)
+const Book = require('../config/models/book');
+
+
 
 
 router.get('/', async (req, res) => {
@@ -45,6 +48,50 @@ router.get('/author-search', async (req, res) => {
 });
 
 
+router.get('/books-by-author', async (req, res) => {
+    let query = req.query.name; // Obtenez le nom de l'auteur de la requête
+    if (!query) {
+        return res.status(400).send({ error: 'Author name is missing' });
+    }
+
+    const startTime = new Date();
+
+    try {
+        console.log('Requête initiale:', query); // Affiche la requête initiale
+
+        // Tokenisez la requête en séparant les mots et convertissez en minuscules
+        let tokens = query.split(/\s+|,/).map(token => token.toLowerCase());
+
+        console.log('Tokens initiaux:', tokens); // Affiche les tokens initiaux
+
+        // Filtrez les tokens en éliminant les stop words
+        tokens = tokens.filter(token => !stopWords.includes(token));
+
+        console.log('Tokens après filtrage des stop words:', tokens); // Affiche les tokens après filtrage
+
+        // Préparation de la regex pour une correspondance flexible avec les noms d'auteurs
+        const regexPattern = tokens.join('|');
+        const regexQuery = new RegExp(regexPattern, 'i');
+
+        // Trouvez les auteurs correspondants à la requête
+        const matchingAuthors = await Author.find({ name: { $regex: regexQuery } });
+
+        if (matchingAuthors.length > 0) {
+            // Trouvez tous les livres écrits par les auteurs trouvés
+            const authorIds = matchingAuthors.map(author => author._id);
+            const books = await Book.find({ authors: { $in: authorIds } }).populate('authors');
+
+            res.json(books);
+        } else {
+            res.status(404).send({ message: 'No books found for the given author name.' });
+        }
+    } catch (error) {
+        res.status(500).send({ error: 'Error during books search by author: ' + error.message });
+    } finally {
+        const endTime = new Date();
+        console.log(`Search executed in ${(endTime - startTime) / 1000} seconds`);
+    }
+});
 
 
 
