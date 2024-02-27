@@ -32,6 +32,8 @@ https://github.com/ONeal013/The-Verges
 # Fonction de classement 
 http://localhost:3000/suggestions/ranked
 
+# recherche par auteur SANS la distance levenstein
+http://localhost:3000/authors/author-search?q=Louisa%20May
 
 
 #OBSOLETE : 24/02/2024 Test suggestion 1 : cacluler les scores de jaccard et les mettre dans la mongodb

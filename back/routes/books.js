@@ -9,6 +9,8 @@ const { getPageRankScores } = require('../managers/pageRank');
 
 
 
+
+
 router.get('/fetch', async (req, res) => {
     try {
         await fetchAndStoreBooks();
@@ -188,9 +190,13 @@ router.get('/advanced-search', async (req, res) => {
 });
 
 
+
+
+
 router.get('/:id', (req, res) => {
     res.send('One book');
 });
+
 
 module.exports = router;
 
