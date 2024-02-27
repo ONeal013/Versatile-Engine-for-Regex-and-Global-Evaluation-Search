@@ -62,6 +62,17 @@ router.get('/search', async (req, res) => {
     // Démarrez le chronométrage ici
     const startTime = new Date();
 
+    // Nouvelle étape: Recherche par titre exact
+    try {
+        const exactMatchBook = await Book.findOne({ title: query }); // Assurez-vous que 'title' est le bon champ
+        if (exactMatchBook) {
+            // Si un match exact est trouvé, renvoyez-le immédiatement
+            return res.json({ data: [exactMatchBook] }); // Ajustez selon le format de réponse souhaité
+        }
+    } catch (error) {
+        return res.status(500).send({ error: 'Error during exact match search: ' + error.message });
+    }
+
     const queries = tokenize(query.toLowerCase());
     let result = {
         info: {time: 0, length: 0}, // Ajouté pour enregistrer le temps d'exécution et la longueur des données
@@ -126,15 +137,12 @@ router.get('/search', async (req, res) => {
         result.data = books;
         result.info.length = books.length; // Enregistrez la longueur des données
 
-        
         // Arrêtez le chronométrage et calculez le temps d'exécution en secondes
         const endTime = new Date();
         result.info.time = (endTime - startTime) / 1000; // Convertit le temps écoulé en secondes
 
-
         res.json(result);
     } catch (error) {
-        //console.error(error);
         res.status(500).send({ error: error.message });
     }
 });
