@@ -1,4 +1,4 @@
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { Pressable, StyleSheet, Text, View, Image } from 'react-native';
 import Colors from '../constants/colors';
 import Physics from '../constants/physics';
 import { Book } from '../models/book';
@@ -15,7 +15,8 @@ export default function KSearchResult(props: Props) {
     return (
         <Pressable style={styles.wrapper} onPress={props.onPress}>
             <View style={styles.leading}>
-                <Ionicons name="book" size={Physics.icon.large} color={Colors.light.primaryDark} />
+                <Image source={{ uri: Strings.apiBookCover_(book.id) }} style={{ flex: 1, width: 50, height: 100 }} />
+                {/* <Ionicons name="book" size={Physics.icon.large} color={Colors.light.primaryDark} /> */}
             </View>
             <View style={styles.container}>
                 <View>

@@ -1,26 +1,23 @@
-import { StyleSheet, View, ScrollView } from 'react-native';
+import { StyleSheet, Text, View, ScrollView } from 'react-native';
 import Colors from '../constants/colors';
 import Physics from '../constants/physics';
-import { useAuthorSuggestion } from '../hooks/suggestions/author';
-import KAuthorSuggestion from '../components/AuthorSug';
+import { useBookSuggestion } from '../hooks/suggestions/book';
+import { Book } from '../models/book';
 
 interface Props {
-    term?: any;
+    book: Book;
 }
 
-export default function KAuthorSuggestionView(props: Props) {
-    const [isSuggestionComplete, suggestions] = useAuthorSuggestion(props.term);
+export default function KBookSuggestionView(props: Props) {
+    const [isSuggestionComplete, suggestions] = useBookSuggestion(props.book);
 
     return (
         <View style={styles.container}>
             <ScrollView style={styles.scroller} horizontal={true} showsHorizontalScrollIndicator={false}>
-                {suggestions && suggestions.map((author, index) => {
+                {suggestions && suggestions.similarDocs.map((entry, index) => {
                     return (
                         <View style={styles.sug} key={index}>
-                            <KAuthorSuggestion
-                                author={author}
-                                onPress={() => { console.log('Author: ', author); }}
-                            />
+                            <Text>{entry.docId.title}</Text>
                         </View>
                     );
                 })}
@@ -32,6 +29,7 @@ export default function KAuthorSuggestionView(props: Props) {
 const styles = StyleSheet.create({
     container: {
         width: '100%',
+        maxWidth: 350,
         flexDirection: 'column',
         // justifyContent: 'center',
         // backgroundColor: Colors.light.canvas,
