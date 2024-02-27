@@ -5,6 +5,10 @@ import { Book } from "../../models/book";
 type SearchResults = {
   message?: string;
   error?: string;
+  info?: {
+    total: number;
+    time: number;
+  };
   tokens?: {
     [key: string]: {
       [key: string]: number;

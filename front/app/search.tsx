@@ -69,7 +69,7 @@ export default function Search() {
                                         ))
                                 }
                             </ScrollView>
-                            {results.data && <KBookSuggestionView book={results.data[0]} />}
+                            {results.data && results.data[0] && <KBookSuggestionView book={results.data[0]} />}
                         </View>
                     </ScrollView>
                 </View>}
