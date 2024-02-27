@@ -12,7 +12,7 @@ import Strings from '../src/constants/strings';
 import { ActivityIndicator } from 'react-native';
 import Colors from '../src/constants/colors';
 import KAuthorSuggestionView from '../src/views/AuthorSug';
-import KBackground from '../src/components/Background';
+import KBackground from '../src/components/background';
 import KBookSuggestionView from '../src/views/BookSug';
 
 

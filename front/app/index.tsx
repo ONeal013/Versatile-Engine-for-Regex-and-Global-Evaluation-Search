@@ -1,7 +1,7 @@
 import { StatusBar } from 'expo-status-bar';
 import { StyleSheet, View, Text, Pressable } from 'react-native';
 import * as NavigationBar from 'expo-navigation-bar';
-import KBackground from '../src/components/Background';
+import KBackground from '../src/components/background';
 import KTextInput from '../src/components/TextInput';
 import KButton from '../src/components/Button';
 import Physics from '../src/constants/physics';
