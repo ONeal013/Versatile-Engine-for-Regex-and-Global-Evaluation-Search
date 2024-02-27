@@ -2,6 +2,7 @@ import { Author } from "./author";
 
 // Book model
 export interface Book {
+  _id: string;
   id: number;
   title: string;
   authors: Author[];
