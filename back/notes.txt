@@ -20,7 +20,7 @@ lancer dans cet ordre
 http://localhost:3000/books/advanced-search/regex=
 
 #Test suggestion avec id 
-# http://localhost:3000/suggestions/65dc89b3c42151114cd7551c
+# http://localhost:3000/suggestions/65dcaf4001d3f94faad92d38
 
 
 #Test suggestion poir tous les livres 
