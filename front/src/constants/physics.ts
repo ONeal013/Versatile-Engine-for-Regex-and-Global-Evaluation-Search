@@ -43,11 +43,19 @@ const Physics = {
       medium: 15,
       large: 20,
     },
+    title: {
+      small: 18,
+      medium: 24,
+      large: 32,
+    },
   },
   icon: {
     small: 16,
     medium: 24,
     large: 32,
+  },
+  aspectRatio: {
+    bookCover: 3 / 4.65,
   },
 };
 

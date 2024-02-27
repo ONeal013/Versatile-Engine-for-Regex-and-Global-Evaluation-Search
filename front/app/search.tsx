@@ -12,7 +12,6 @@ import Strings from '../src/constants/strings';
 import { ActivityIndicator } from 'react-native';
 import Colors from '../src/constants/colors';
 import KAuthorSuggestionView from '../src/views/AuthorSug';
-import KBackground from '../src/components/Background';
 import KBookSuggestionView from '../src/views/BookSug';
 
 
@@ -34,7 +33,12 @@ export default function Search() {
                         {/* <KIconButton name="settings" onPress={() => { }} />*/}
                     </SafeAreaView>
                 </View>
-                {results && <View style={styles.resultZone}>
+                {isLoadingComplete === false &&
+                    <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
+                        <ActivityIndicator style={{ flex: 1 }} size="large" color={Colors.light.secondaryDark} />
+                    </View>
+                }
+                {isLoadingComplete === true && results && <View style={styles.resultZone}>
                     <ScrollView>
                         {
                             results.tokens &&
@@ -51,25 +55,22 @@ export default function Search() {
                         {results?.data && <View style={styles.sugContainer}>
                             <KAuthorSuggestionView term={term} />
                         </View>}
-                        {isLoadingComplete === false && <ActivityIndicator style={{ flex: 1 }} size="large" color="#fff" />}
-                        {isLoadingComplete === true && results !== null && (
-                            <View style={{ flexDirection: 'row' }}>
-                                <ScrollView style={styles.resultList} showsVerticalScrollIndicator={false}>
-                                    {
-                                        (results.message !== undefined)
-                                            ? <View style={styles.resultMessage}>
-                                                <Text>{results.message}</Text>
+                        <View style={{ flexDirection: 'row' }}>
+                            <ScrollView style={styles.resultList} showsVerticalScrollIndicator={false}>
+                                {
+                                    (results.message !== undefined)
+                                        ? <View style={styles.resultMessage}>
+                                            <Text>{results.message}</Text>
+                                        </View>
+                                        : (results.data ?? []).map((book, i) => (
+                                            <View key={i} style={styles.resultItem}>
+                                                <KSearchResult book={book} />
                                             </View>
-                                            : (results.data ?? []).map((book, i) => (
-                                                <View key={i} style={styles.resultItem}>
-                                                    <KSearchResult book={book} />
-                                                </View>
-                                            ))
-                                    }
-                                </ScrollView>
-                                {results.data && <KBookSuggestionView book={results.data[0]} />}
-                            </View>
-                        )}
+                                        ))
+                                }
+                            </ScrollView>
+                            {results.data && <KBookSuggestionView book={results.data[0]} />}
+                        </View>
                     </ScrollView>
                 </View>}
             </View>
@@ -163,8 +164,9 @@ const styles = StyleSheet.create({
         gap: Physics.gap.medium,
     },
     resultList: {
+        flexGrow: 1,
         gap: Physics.gap.large,
-        paddingHorizontal: Physics.padding.small,
+        paddingHorizontal: Physics.padding.medium,
         borderRadius: Physics.borderRadius.medium,
     },
     resultItem: {
