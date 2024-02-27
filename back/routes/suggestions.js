@@ -41,15 +41,20 @@ router.get('/ranked', async (req, res) => {
 router.get('/:bookId', async (req, res) => {
     try {
         const bookId = req.params.bookId;
-    const suggestions = await JaccardScore.findOne({docId: new ObjectId(bookId)})
-    .populate('docId')
-    .populate({
-        path: 'similarDocs', 
-        populate: { 
-            path: 'docId'
+        const suggestions = await JaccardScore.findOne({ docId: new ObjectId(bookId) })
+            .populate('docId')
+            .populate({
+                path: 'similarDocs.docId', // Assurez-vous que le chemin est correct pour accéder aux documents similaires
+            })
+            .exec();
+
+        if (suggestions && suggestions.similarDocs && suggestions.similarDocs.length > 0) {
+            // Triez par score si nécessaire et limitez à 5 suggestions
+            suggestions.similarDocs = suggestions.similarDocs
+                .sort((a, b) => b.score - a.score) // Assumer que chaque doc a un attribut score, ajustez selon votre modèle
+                .slice(0, 5); // Gardez seulement les 5 premiers documents
         }
-    })
-    .exec();
+
         res.json(suggestions);
     } catch (error) {
         res.status(500).send({ error: error.message });
