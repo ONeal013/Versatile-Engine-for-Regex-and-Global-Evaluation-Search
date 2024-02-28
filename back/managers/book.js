@@ -98,9 +98,6 @@ async function reverseIndex() {
     return reverseIndex;
 }
 
-
-
-
 module.exports = { fetchAndStoreBooks, reverseIndex};
 
 
