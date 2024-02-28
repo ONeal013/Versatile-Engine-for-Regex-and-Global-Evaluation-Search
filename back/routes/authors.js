@@ -27,25 +27,22 @@ router.get('/author-search', async (req, res) => {
         return res.status(400).send({ error: 'Query parameter is missing' });
     }
 
-    const startTime = new Date();
-
     try {
-        // Récupérez les noms d'auteurs pour le FuzzySet
-        const authorNames = await getAllAuthorNames(); // Assurez-vous que cette fonction est correctement implémentée
-        let a = FuzzySet(authorNames);
-
-        // Auto-correction de la requête
-        let correctedQuery = a.get(query);
-        if (correctedQuery) {
-            query = correctedQuery[0][1]; // Utilisez la correction pour la recherche
-        }
-
-        // Préparation de la regex pour une correspondance flexible
-        const regexParts = query.split(/\s+|,/).filter(part => !stopWords.includes(part.toLowerCase()));
-        const regexPattern = regexParts.join('|');
-        const regexQuery = new RegExp(regexPattern, 'i');
-
-        const authors = await Author.find({ name: { $regex: regexQuery } });
+        const authors = await Author.aggregate([
+            {
+                $search: {
+                    index: 'default', // Assurez-vous que ceci correspond au nom de votre indice Atlas Search
+                    text: {
+                        query: query,
+                        path: 'name', // Le champ à rechercher
+                        fuzzy: {}
+                    }
+                }
+            },
+            {
+                $limit: 1 // Limitez les résultats si nécessaire
+            }
+        ]);
 
         if (authors.length > 0) {
             return res.json({ data: authors });
@@ -54,9 +51,6 @@ router.get('/author-search', async (req, res) => {
         }
     } catch (error) {
         return res.status(500).send({ error: 'Error during author search: ' + error.message });
-    } finally {
-        const endTime = new Date();
-        console.log(`Search executed in ${(endTime - startTime) / 1000} seconds`);
     }
 });
 
@@ -67,36 +61,23 @@ router.get('/books-by-author', async (req, res) => {
         return res.status(400).send({ error: 'Author name is missing' });
     }
 
-    const authorNames = await getAllAuthorNames(); // Récupère les noms d'auteurs
-    let a = FuzzySet(authorNames); // Crée FuzzySet avec les noms d'auteurs
-
-    let correctedQuery = a.get(query);
-    if (correctedQuery) {
-        query = correctedQuery[0][1];
-    }
-
-
-    const startTime = new Date();
-
     try {
-        console.log('Requête initiale:', query); // Affiche la requête initiale
-
-        // Tokenisez la requête en séparant les mots et convertissez en minuscules
-        let tokens = query.split(/\s+|,/).map(token => token.toLowerCase());
-
-        console.log('Tokens initiaux:', tokens); // Affiche les tokens initiaux
-
-        // Filtrez les tokens en éliminant les stop words
-        tokens = tokens.filter(token => !stopWords.includes(token));
-
-        console.log('Tokens après filtrage des stop words:', tokens); // Affiche les tokens après filtrage
-
-        // Préparation de la regex pour une correspondance flexible avec les noms d'auteurs
-        const regexPattern = tokens.join('|');
-        const regexQuery = new RegExp(regexPattern, 'i');
-
-        // Trouvez les auteurs correspondants à la requête
-        const matchingAuthors = await Author.find({ name: { $regex: regexQuery } });
+        // Recherche d'auteurs avec Atlas Search
+        const matchingAuthors = await Author.aggregate([
+            {
+                $search: {
+                    index: 'default', // Assurez-vous que ceci correspond au nom de votre indice Atlas Search
+                    text: {
+                        query: query,
+                        path: 'name', // Le champ à rechercher
+                        fuzzy: {}
+                    }
+                }
+            },
+            {
+                $limit: 30 // Limitez les résultats si nécessaire
+            }
+        ]);
 
         if (matchingAuthors.length > 0) {
             // Trouvez tous les livres écrits par les auteurs trouvés
@@ -109,13 +90,8 @@ router.get('/books-by-author', async (req, res) => {
         }
     } catch (error) {
         res.status(500).send({ error: 'Error during books search by author: ' + error.message });
-    } finally {
-        const endTime = new Date();
-        console.log(`Search executed in ${(endTime - startTime) / 1000} seconds`);
     }
 });
-
-
 
 // Endpoint pour récupérer les informations d'un auteur spécifique par son ID
 router.get('/:id', async (req, res) => {
