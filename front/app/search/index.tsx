@@ -92,6 +92,13 @@ export default function Search() {
                             </ScrollView>
                             {results.data && results.data[0] && <KBookSuggestionView book={results.data[0]} onSuggestionSelect={searchBook} />}
                         </View>
+                        {results.info && <View>
+                            <Text>Time: {results.info.time}s</Text>
+                            <Text>Results: {results.info.length}</Text>
+                            <Text>Page: {results.info.page}</Text>
+                            <Text>Pages: {results.info.length / results.info.limit}</Text>
+                            <Text>Pages: {(results.info.length / results.info.limit).toFixed() + 1}</Text>
+                        </View>}
                     </ScrollView>
                 </View>}
             </View>

@@ -11,6 +11,8 @@ type SearchResults = {
   info?: {
     length: number;
     time: number;
+    page: number;
+    limit: number;
   };
   tokens?: {
     [key: string]: {
