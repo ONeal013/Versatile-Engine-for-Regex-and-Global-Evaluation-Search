@@ -3,6 +3,9 @@ const router = express.Router();
 const Author = require('../config/models/author');
 const stopWords = require('../stop_words_english.json') + Array.from({ length: 100 }, (_, i) => i)
 const Book = require('../config/models/book');
+const FuzzySet = require('fuzzyset.js');
+const { getAllAuthorNames } = require('../config/helpers/dataHelper');
+
 
 
 
@@ -27,6 +30,16 @@ router.get('/author-search', async (req, res) => {
     const startTime = new Date();
 
     try {
+        // Récupérez les noms d'auteurs pour le FuzzySet
+        const authorNames = await getAllAuthorNames(); // Assurez-vous que cette fonction est correctement implémentée
+        let a = FuzzySet(authorNames);
+
+        // Auto-correction de la requête
+        let correctedQuery = a.get(query);
+        if (correctedQuery) {
+            query = correctedQuery[0][1]; // Utilisez la correction pour la recherche
+        }
+
         // Préparation de la regex pour une correspondance flexible
         const regexParts = query.split(/\s+|,/).filter(part => !stopWords.includes(part.toLowerCase()));
         const regexPattern = regexParts.join('|');
@@ -49,10 +62,19 @@ router.get('/author-search', async (req, res) => {
 
 
 router.get('/books-by-author', async (req, res) => {
-    let query = req.query.name; // Obtenez le nom de l'auteur de la requête
+    let query = req.query.name;
     if (!query) {
         return res.status(400).send({ error: 'Author name is missing' });
     }
+
+    const authorNames = await getAllAuthorNames(); // Récupère les noms d'auteurs
+    let a = FuzzySet(authorNames); // Crée FuzzySet avec les noms d'auteurs
+
+    let correctedQuery = a.get(query);
+    if (correctedQuery) {
+        query = correctedQuery[0][1];
+    }
+
 
     const startTime = new Date();
 

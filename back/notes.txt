@@ -32,11 +32,12 @@ https://github.com/ONeal013/The-Verges
 # Fonction de classement 
 http://localhost:3000/suggestions/ranked
 
-# recherche d'auteur SANS la distance levenstein
+
+# recherche d'auteur 
 http://localhost:3000/authors/author-search?q=Louisa%20May
 
 
-# recherche par de livre par auteur
+# recherche de livre par auteur
 http://localhost:3000/authors/books-by-author?name=Stoker,%20Bram
 
 
