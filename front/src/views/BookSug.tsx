@@ -1,4 +1,4 @@
-import { StyleSheet, Text, View, ScrollView, Image, ActivityIndicator } from 'react-native';
+import { StyleSheet, Text, View, ScrollView, Image, ActivityIndicator, Pressable } from 'react-native';
 import Colors from '../constants/colors';
 import Physics from '../constants/physics';
 import { useBookSuggestion } from '../hooks/suggestions/book';
@@ -10,6 +10,7 @@ import KAuthorTile from '../components/AuthorTile';
 
 interface Props {
     book: Book;
+    onSuggestionSelect?: (book: Book) => void;
 }
 
 export default function KBookSuggestionView(props: Props) {
@@ -53,13 +54,13 @@ export default function KBookSuggestionView(props: Props) {
                 <ScrollView style={styles.scroller} horizontal={true} showsHorizontalScrollIndicator={false}>
                     {suggestions && suggestions.similarDocs.map((entry, index) => {
                         return (
-                            <View style={{ ...styles.sug, width: 90 }} key={index}>
+                            <Pressable style={{ ...styles.sug, width: 90 }} key={index} onPress={() => props.onSuggestionSelect?.(entry.docId)}>
                                 <View style={{ ...styles.image, width: 90 }}>
                                     <Image source={{ uri: Strings.apiBookCover_(entry.docId.id) }} style={{ flex: 1 }} />
                                 </View>
                                 <Text style={styles.litleTitle} numberOfLines={2}>{entry.docId.title}</Text>
                                 {entry.docId.authors[0] && <Text>{entry.docId.authors[0]?.name}</Text>}
-                            </View>
+                            </Pressable>
                         );
                     })}
                 </ScrollView>
