@@ -4,6 +4,7 @@ import Physics from '../constants/physics';
 import { Book } from '../models/book';
 import Strings from '../constants/strings';
 import Ionicons from '@expo/vector-icons/Ionicons';
+import { Link } from 'expo-router';
 
 interface Props {
     book: Book;
@@ -13,15 +14,15 @@ interface Props {
 export default function KSearchResult(props: Props) {
     const book = props.book;
     return (
-        <Pressable style={styles.wrapper} onPress={props.onPress}>
+        <View style={styles.wrapper}>
             <View style={styles.leading}>
                 <Image source={{ uri: Strings.apiBookCover_(book.id) }} style={{ flex: 1 }} />
                 {/* <Ionicons name="book" size={Physics.icon.large} color={Colors.light.primaryDark} /> */}
             </View>
             <View style={styles.container}>
-                <View>
+                <Pressable onPress={props.onPress}>
                     <Text style={styles.title}>{book.title}</Text>
-                </View>
+                </Pressable>
                 {/* <View style={{ flexDirection: 'row', flexWrap: 'wrap' }}>
                     <Text>{Strings.authors}: </Text>
                     <View style={styles.subtitleContainer}>
@@ -59,7 +60,7 @@ export default function KSearchResult(props: Props) {
                     ))}
                 </ScrollView>
             </View>
-        </Pressable >
+        </View>
     );
 }
 

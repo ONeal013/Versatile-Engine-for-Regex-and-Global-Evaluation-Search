@@ -1,26 +1,35 @@
 import { StatusBar } from 'expo-status-bar';
 import { ScrollView, StyleSheet, Text, View } from 'react-native';
 import * as NavigationBar from 'expo-navigation-bar';
-import KTextInput from '../src/components/TextInput';
-import KButton from '../src/components/Button';
-import Physics from '../src/constants/physics';
-import React from 'react';
-import KSearchResult from '../src/components/search_result';
-import { useSearch } from '../src/hooks/search/basic';
+import KTextInput from '../../src/components/TextInput';
+import KButton from '../../src/components/Button';
+import Physics from '../../src/constants/physics';
+import React, { useEffect } from 'react';
+import KSearchResult from '../../src/components/search_result';
+import { useSearch } from '../../src/hooks/search/basic';
 import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
-import Strings from '../src/constants/strings';
+import Strings from '../../src/constants/strings';
 import { ActivityIndicator } from 'react-native';
-import Colors from '../src/constants/colors';
-import KAuthorSuggestionView from '../src/views/AuthorSug';
-import KBookSuggestionView from '../src/views/BookSug';
+import Colors from '../../src/constants/colors';
+import KAuthorSuggestionView from '../../src/views/AuthorSug';
+import KBookSuggestionView from '../../src/views/BookSug';
+import { useLocalSearchParams } from 'expo-router';
+import { Book } from '../../src/models/book';
 
 
 export default function Search() {
+    // get expo url params 
+    const params = useLocalSearchParams<{ q?: string }>();
     NavigationBar.setBackgroundColorAsync('#1d2437');
 
     // hooks
-    const [term, setTerm] = React.useState<string>('');
+    const [term, setTerm] = React.useState<string>(params.q ?? '');
     const [isLoadingComplete, results, searchStr] = useSearch();
+
+    const searchBook = (book: Book) => {
+        setTerm(book.title);
+        return searchStr(book.title);
+    }
 
     return (
         <SafeAreaProvider>
@@ -44,7 +53,9 @@ export default function Search() {
                             results.tokens &&
                             <View style={styles.resultInfo}>
                                 <View style={styles.resultTokens}>
-                                    {results.data && <Text>{results.data!.length} Results</Text>}
+                                    {results.info && <Text style={{ fontWeight: 'bold' }}>{results.info!.length}</Text>}
+                                    <Text> results in </Text>
+                                    {results.info && <Text style={{ fontWeight: 'bold' }}>{results.info!.time}</Text>}
                                     <Text>for :</Text>
                                     {Object.keys(results.tokens).map((token, i) => (
                                         <Text key={i}>{token}</Text>
@@ -64,12 +75,12 @@ export default function Search() {
                                         </View>
                                         : (results.data ?? []).map((book, i) => (
                                             <View key={i} style={styles.resultItem}>
-                                                <KSearchResult book={book} />
+                                                <KSearchResult book={book} onPress={() => searchBook(book)} />
                                             </View>
                                         ))
                                 }
                             </ScrollView>
-                            {results.data && results.data[0] && <KBookSuggestionView book={results.data[0]} />}
+                            {results.data && results.data[0] && <KBookSuggestionView book={results.data[0]} onSuggestionSelect={searchBook} />}
                         </View>
                     </ScrollView>
                 </View>}
