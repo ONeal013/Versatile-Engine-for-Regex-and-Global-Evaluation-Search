@@ -69,26 +69,13 @@ const correctQueries = async (queries) => {
  */
 
 router.get('/search', async (req, res) => {
+    // Démarrez le chronométrage ici
+    const startTime = new Date();
+
     let query = req.query.q;
     if (!query) {
         return res.status(400).send({ error: 'Query parameter is missing' });
     }
-
-    // Démarrez le chronométrage ici
-    const startTime = new Date();
-
-        // Nouvelle étape: Recherche par titre exact
-    try {
-        const exactMatchBook = await Book.findOne({ title: query }); // Assurez-vous que 'title' est le bon champ
-        if (exactMatchBook) {
-            // Si un match exact est trouvé, renvoyez-le immédiatement
-            return res.json({ data: [exactMatchBook] }); // Ajustez selon le format de réponse souhaité
-        }
-    } catch (error) {
-        return res.status(500).send({ error: 'Error during exact match search: ' + error.message });
-    }
- 
-
 
     const queries = tokenize(query.toLowerCase());
     let result = {
@@ -100,6 +87,14 @@ router.get('/search', async (req, res) => {
 
     const data = new Set();
     const weights = {};
+
+    // Nouvelle étape: Recherche par titre exact
+    const exactMatchBook = await Book.findOne({ title: query }); // Assurez-vous que 'title' est le bon champ
+    if (exactMatchBook) {
+        // Si un match exact est trouvé, renvoyez-le immédiatement
+       data.add(exactMatchBook._id);
+       weights[exactMatchBook._id] = 100000;
+    }
 
     try {
         for (const singleQuery of Object.keys(queries)) {
