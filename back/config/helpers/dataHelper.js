@@ -4,6 +4,7 @@ const Index = require('../models/index'); // Assurez-vous que ce chemin correspo
 const Book = require('../models/book');
 
 
+
 async function getJaccardScores(documentIds) {
     const scores = [];
 
@@ -58,7 +59,22 @@ async function getAllBookIds() {
     }
 }
 
-module.exports = { getJaccardScores, getTokenOccurrences, getAllBookIds};
+
+
+async function getAllAuthorNames() {
+    try {
+        const authors = await Author.find({}, 'name'); // Récupère tous les auteurs avec seulement le champ 'name'
+        const authorNames = authors.map(author => author.name); // Transforme en un tableau de noms
+        return authorNames;
+    } catch (error) {
+        console.error('Error fetching author names:', error);
+        return []; // Retourne un tableau vide en cas d'erreur
+    }
+}
+
+
+
+module.exports = { getJaccardScores, getTokenOccurrences, getAllBookIds, getAllAuthorNames};
 
 
 

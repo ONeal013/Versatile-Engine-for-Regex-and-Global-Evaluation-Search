@@ -5,6 +5,13 @@ import { Book } from "../../models/book";
 type SearchResults = {
   message?: string;
   error?: string;
+  typos: {
+    [key: string]: string;
+  };
+  info?: {
+    length: number;
+    time: number;
+  };
   tokens?: {
     [key: string]: {
       [key: string]: number;
