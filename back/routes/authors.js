@@ -1,9 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const Author = require('../config/models/author');
-const stopWords = require('../stop_words_english.json') + Array.from({ length: 100 }, (_, i) => i)
 const Book = require('../config/models/book');
-const FuzzySet = require('fuzzyset.js');
 const { getAllAuthorNames } = require('../config/helpers/dataHelper');
 
 
@@ -15,7 +13,7 @@ router.get('/', async (req, res) => {
         const authors = await Author.find().populate();
         res.json(authors);
     } catch (error) {
-        res.status(500).send({error: error.message});
+        res.status(500).send({ error: error.message });
     }
 });
 

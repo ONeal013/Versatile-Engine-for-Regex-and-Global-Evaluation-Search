@@ -31,6 +31,18 @@ export default function Search() {
         return searchStr(book.title);
     }
 
+    const correctedText: Array<React.JSX.Element> = [];
+    if (results?.typos) {
+        let _term = term.toLocaleLowerCase();
+        Object.entries(results.typos).forEach(([subTerm, token]) => {
+            const index = _term.indexOf(subTerm)
+            const length = subTerm.length;
+            correctedText.push(<Text>{_term.slice(0, index)}</Text>);
+            correctedText.push(<Text style={{ fontWeight: 'bold' }}>{token}</Text>);
+            _term = _term.slice(index + length);
+        });
+    }
+
     return (
         <SafeAreaProvider>
             <View style={styles.container}>
@@ -54,12 +66,10 @@ export default function Search() {
                             <View style={styles.resultInfo}>
                                 <View style={styles.resultTokens}>
                                     {results.info && <Text style={{ fontWeight: 'bold' }}>{results.info!.length}</Text>}
-                                    <Text> results in </Text>
-                                    {results.info && <Text style={{ fontWeight: 'bold' }}>{results.info!.time}</Text>}
+                                    <Text>results in</Text>
+                                    {results.info && <Text style={{ fontWeight: 'bold' }}>{results.info!.time}s</Text>}
                                     <Text>for :</Text>
-                                    {Object.keys(results.tokens).map((token, i) => (
-                                        <Text key={i}>{token}</Text>
-                                    ))}
+                                    {correctedText}
                                 </View>
                             </View>
                         }
