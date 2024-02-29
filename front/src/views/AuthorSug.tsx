@@ -3,13 +3,14 @@ import Colors from '../constants/colors';
 import Physics from '../constants/physics';
 import { useAuthorSuggestion } from '../hooks/suggestions/author';
 import KAuthorSuggestion from '../components/AuthorSug';
+import { Book } from '../models/book';
 
 interface Props {
-    term?: any;
+    book?: Book;
 }
 
 export default function KAuthorSuggestionView(props: Props) {
-    const [isSuggestionComplete, suggestions] = useAuthorSuggestion(props.term);
+    const [isSuggestionComplete, suggestions] = useAuthorSuggestion(props.book);
 
     return (
         <View style={styles.container}>

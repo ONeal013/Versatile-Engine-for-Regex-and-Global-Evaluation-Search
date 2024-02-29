@@ -5,6 +5,7 @@ const Strings = {
   apiBooks: apiBaseUrl + "books/",
   apiSearch: apiBaseUrl + "books/search",
   apiAuthors: apiBaseUrl + "authors/",
+  apiAuthorSug: apiBaseUrl + "authors/similar/",
   apiSugBook: apiBaseUrl + "suggestions/",
   apiBookCover_: (id: number, size: "small" | "medium" = "medium") =>
     `https://www.gutenberg.org/cache/epub/${id}/pg${id}.cover.${size}.jpg`,

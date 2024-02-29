@@ -1,8 +1,9 @@
 import React, { useEffect } from "react";
 import Strings from "../../constants/strings";
 import { Author } from "../../models/author";
+import { Book } from "../../models/book";
 
-export function useAuthorSuggestion(term: any) {
+export function useAuthorSuggestion(book: Book | undefined) {
   // ! todo: fix term any type
   const [suggestions, setSuggestions] = React.useState<Array<Author> | null>(
     null
@@ -14,8 +15,8 @@ export function useAuthorSuggestion(term: any) {
     setSuggestionComplete(false);
     // fetch data from api
     try {
-      // const url = Strings.apiAuthors + "?q=" + term;
-      const url = Strings.apiAuthors;
+      const url = Strings.apiAuthorSug + book?._id;
+      // const url = Strings.apiAuthors;
       console.log("Fetching data from: ", url);
       const response = await fetch(url, {
         method: "GET",
@@ -25,6 +26,7 @@ export function useAuthorSuggestion(term: any) {
         },
       });
       const results = await response.json();
+      console.log(results);
       console.log(results.length, " suggestions found");
       setSuggestionComplete(true);
       setSuggestions(results);
@@ -35,10 +37,10 @@ export function useAuthorSuggestion(term: any) {
   };
 
   useEffect(() => {
-    if (term) {
+    if (book) {
       fecthSuggestions();
     }
-  }, [term]);
+  }, [book]);
 
   return [isSuggestionComplete, suggestions] as const;
 }

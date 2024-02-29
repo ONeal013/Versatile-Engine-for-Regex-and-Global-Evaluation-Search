@@ -3,6 +3,8 @@ const router = express.Router();
 const Author = require('../config/models/author');
 const Book = require('../config/models/book');
 const { getAllAuthorNames } = require('../config/helpers/dataHelper');
+const ReverseIndex = require('../config/models/reverse_index');
+const jaccardScore = require('../config/models/jaccardScore');
 
 
 
@@ -19,7 +21,7 @@ router.get('/', async (req, res) => {
 
 
 
-router.get('/author-search', async (req, res) => {
+router.get('/search', async (req, res) => {
     let query = req.query.q;
     if (!query) {
         return res.status(400).send({ error: 'Query parameter is missing' });
@@ -53,7 +55,7 @@ router.get('/author-search', async (req, res) => {
 });
 
 
-router.get('/books-by-author', async (req, res) => {
+router.get('/books', async (req, res) => {
     let query = req.query.name;
     if (!query) {
         return res.status(400).send({ error: 'Author name is missing' });
@@ -88,6 +90,29 @@ router.get('/books-by-author', async (req, res) => {
         }
     } catch (error) {
         res.status(500).send({ error: 'Error during books search by author: ' + error.message });
+    }
+});
+
+// Endpoint pour récupérer les auteurs des livres similaires au livre spécifié par son ID
+router.get('/similar/:id', async (req, res) => {
+    try {
+        const bookId = req.params.id;
+        const book = await Book.findById(bookId);
+        if (!book) {
+            return res.status(404).send({ message: 'Book not found' });
+        }
+
+        const entry = await jaccardScore.findOne({ docId: bookId }).populate('similarDocs.docId');
+        const authorIds = new Set();
+        book.authors.forEach(authorIds.add, authorIds);
+        entry.similarDocs.sort((a, b) => b.score - a.score).slice(0, 8)
+            .forEach(item => item.docId.authors.forEach(authorIds.add, authorIds));
+
+        const authors = await Author.find({ _id: { $in: Array.from(authorIds) } });
+
+        return res.json(authors);
+    } catch (error) {
+        return res.status(500).send({ error: error.message });
     }
 });
 

@@ -25,7 +25,7 @@ export default function Search() {
 
     // hooks
     const [term, setTerm] = React.useState<string>(params.q ?? '');
-    const [isLoadingComplete, results, searchedTerm, searchStr] = useSearch();
+    const [isLoadingComplete, results, searchedTerm, searchStr] = useSearch(term);
 
     const searchBook = (book: Book) => {
         setTerm(book.title);
@@ -67,7 +67,7 @@ export default function Search() {
                 {results?.error && <View style={{ alignItems: 'center', justifyContent: 'center' }}>
                     <Text>{results.error}</Text>
                 </View>}
-                {results && !results?.error && <View style={styles.resultZone}>
+                {isLoadingComplete && results && !results?.error && <View style={styles.resultZone}>
                     <ScrollView>
                         {
                             results.tokens &&
@@ -87,8 +87,8 @@ export default function Search() {
                                 </View>
                             </View>
                         }
-                        {results?.data && <View style={styles.sugContainer}>
-                            <KAuthorSuggestionView term={term} />
+                        {results?.data && results.data[0] && <View style={styles.sugContainer}>
+                            <KAuthorSuggestionView book={results.data[0]} />
                         </View>}
                         <View style={{ flexDirection: 'row' }}>
                             <ScrollView style={styles.resultList} showsVerticalScrollIndicator={false}>

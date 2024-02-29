@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import Strings from "../../constants/strings";
 import { Book } from "../../models/book";
 
@@ -22,7 +22,7 @@ type SearchResults = {
   data?: Array<Book>;
 };
 
-export function useSearch() {
+export function useSearch(term?: String) {
   const [results, setResults] = React.useState<SearchResults | null>(null);
   const [searchedTerm, setSearchedTerm] = React.useState<String | null>(null);
   const [isSearchComplete, setSearchComplete] = React.useState<Boolean | null>(
@@ -58,6 +58,12 @@ export function useSearch() {
       setSearchComplete(true);
     }
   };
+
+  useEffect(() => {
+    if (term) {
+      searchStr(term);
+    }
+  }, [term]);
 
   return [isSearchComplete, results, searchedTerm, searchStr] as const;
 }
