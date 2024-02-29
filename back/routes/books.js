@@ -6,6 +6,7 @@ const tokenize = require('../managers/indexor');
 const levenshtein = require('js-levenshtein');
 const { reverseIndex, fetchAndStoreBooks } = require('../managers/book');
 const { getPageRankScores } = require('../managers/pageRank');
+const Content = require('../config/models/content');
 
 
 
@@ -197,22 +198,41 @@ router.get('/', async (req, res) => {
 
 
 router.get('/advanced-search', async (req, res) => {
+    const startTime = new Date();
+
     const { regex } = req.query;
+
+    const page = parseInt(req.query.page) || 1; // Défaut à la page 1 si non spécifié
+    const limit = parseInt(req.query.limit) || 10; // Défaut à 10 éléments par page
+    const skip = (page - 1) * limit;
 
     if (!regex) {
         return res.status(400).send({ error: 'RegEx query parameter is missing' });
     }
 
+    let result = {
+        info: { time: 0, length: 0, page, limit }, // Enregistrez les infos de pagination
+        typos: {},
+        tokens: {},
+        data: [],
+    };
+
     try {
         const searchPattern = new RegExp(regex, 'i');
-        const results = await Content.find({ content: { $regex: searchPattern } }).exec();
-        const data = await Promise.all(results.map((item) => {
-            return Book.findById(item.book).populate({
-                path: 'authors'
-            })
-        }))
-        if (results.length > 0) {
-            res.json(data);
+        const contents = await Content.find({ content: { $regex: searchPattern } });
+        const data = await Book.find({ '_id': { $in: contents.map(item => item.book) } })
+            .lean()
+            .skip(skip)
+            .limit(limit)
+            .populate('authors')
+            .exec();
+        if (contents.length > 0) {
+            result.data = data;
+            result.info.length = contents.length;
+            const endTime = new Date();
+            result.info.time = (endTime - startTime) / 1000;
+
+            res.json(result);
         } else {
             res.send('No books found matching the regex.');
         }

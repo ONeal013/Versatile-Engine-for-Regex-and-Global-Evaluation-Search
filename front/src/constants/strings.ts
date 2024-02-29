@@ -4,6 +4,7 @@ const Strings = {
   apiBaseUrl: apiBaseUrl,
   apiBooks: apiBaseUrl + "books/",
   apiSearch: apiBaseUrl + "books/search",
+  apiSearchAdvanced: apiBaseUrl + "books/advanced-search",
   apiAuthors: apiBaseUrl + "authors/",
   apiAuthorSearch: apiBaseUrl + "authors/search/",
   apiAuthorSug: apiBaseUrl + "authors/similar/",

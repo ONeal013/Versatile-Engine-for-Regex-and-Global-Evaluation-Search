@@ -19,7 +19,7 @@ export default function KAuthorSuggestion(props: Props) {
                 <Ionicons name="person" size={Physics.icon.large} color={Colors.light.primaryDark} />
             </View>
             <View style={styles.container}>
-                <Link href={`/search/authors?q=${author.name}`} >
+                <Link href={`/search/authors?q=${author.name.trim()}`} >
                     <Text numberOfLines={2} style={styles.title}>{author.name}</Text>
                 </Link>
                 {(author.birth_year || author.death_year) && <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: Physics.gap.small }}>

@@ -6,7 +6,7 @@ import KButton from '../../src/components/Button';
 import Physics from '../../src/constants/physics';
 import React, { useEffect } from 'react';
 import KSearchResult from '../../src/components/search_result';
-import { useSearch } from '../../src/hooks/search/author';
+import { useSearch } from '../../src/hooks/search/advanced';
 import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 import Strings from '../../src/constants/strings';
 import { ActivityIndicator } from 'react-native';
@@ -18,12 +18,9 @@ import { Book } from '../../src/models/book';
 import KPaginator from '../../src/components/paginator';
 import KIconButton from '../../src/components/IconButton';
 import { Ionicons } from '@expo/vector-icons';
-import KAuthorTile from '../../src/components/AuthorTile';
-import { Author } from '../../src/models/author';
-import KAuthorSuggestion from '../../src/components/AuthorSug';
 
 
-export default function Search() {
+export default function SearchAdvanced() {
     // get expo url params 
     const params = useLocalSearchParams<{ q?: string }>();
     NavigationBar.setBackgroundColorAsync('#1d2437');
@@ -32,9 +29,9 @@ export default function Search() {
     const [term, setTerm] = React.useState<string>(params.q ?? '');
     const [isLoadingComplete, results, searchedTerm, searchStr] = useSearch();
 
-    const searchAuthor = (author: Author) => {
-        setTerm(author.name);
-        return searchStr(author.name);
+    const searchBook = (book: Book) => {
+        setTerm(book.title);
+        return searchStr(book.title);
     }
 
     const correctedText: Array<React.JSX.Element> = [];
@@ -66,11 +63,11 @@ export default function Search() {
                         <KIconButton link={`/search?q=${term}`}>
                             <Ionicons name="book-outline" size={Physics.icon.medium} color={Colors.light.primaryDark} />
                         </KIconButton>
-                        <KIconButton selected link={`/search/authors?q=${term}`}>
-                            <Ionicons name="person-outline" size={Physics.icon.medium} color={'white'} />
+                        <KIconButton link={`/search/authors?q=${term}`}>
+                            <Ionicons name="person-outline" size={Physics.icon.medium} color={Colors.light.primaryDark} />
                         </KIconButton>
-                        <KIconButton link={`/search/advanced?q=${term}`}>
-                            <Ionicons name="code-slash" size={Physics.icon.medium} color={Colors.light.primaryDark} />
+                        <KIconButton selected link={`/search/advanced?q=${term}`}>
+                            <Ionicons name="code-slash" size={Physics.icon.medium} color={'white'} />
                         </KIconButton>
                     </SafeAreaView>
                 </View>
@@ -79,7 +76,7 @@ export default function Search() {
                         <ActivityIndicator style={{ flex: 1 }} size="large" color={Colors.light.secondaryDark} />
                     </View>
                 }
-                {results?.error && <View style={{ width: '100%', backgroundColor: 'red', alignItems: 'center', justifyContent: 'center' }}>
+                {results?.error && <View style={{ alignItems: 'center', justifyContent: 'center' }}>
                     <Text>{results.error}</Text>
                 </View>}
                 {isLoadingComplete && results && !results?.error && <View style={styles.resultZone}>
@@ -102,23 +99,31 @@ export default function Search() {
                                 </View>
                             </View>
                         }
-                        {/* {results?.data && results.data[0] && <View style={styles.sugContainer}>
+                        {results?.data && results.data[0] && <View style={styles.sugContainer}>
                             <KAuthorSuggestionView book={results.data[0]} />
-                        </View>} */}
-                        <View style={{ flexDirection: 'row', flexWrap: 'wrap', ...styles.resultList }}>
-                            {
-                                (results.message !== undefined)
-                                    ? <View style={styles.resultMessage}>
-                                        <Text>{results.message}</Text>
-                                    </View>
-                                    : (results.data ?? []).map((author, i) => (
-                                        <View key={i} style={styles.resultItem}>
-                                            <KAuthorSuggestion author={author} onPress={() => searchAuthor(author)} />
+                        </View>}
+                        <View style={{ flexDirection: 'row', flexWrap: 'wrap-reverse' }}>
+                            <ScrollView style={styles.resultList} showsVerticalScrollIndicator={false}>
+                                {
+                                    (results.message !== undefined)
+                                        ? <View style={styles.resultMessage}>
+                                            <Text>{results.message}</Text>
                                         </View>
-                                    ))
-                            }
-                            {/* {results.data && results.data[0] && <KBookSuggestionView book={results.data[0]} onSuggestionSelect={searchAuthor} />} */}
+                                        : (results.data ?? []).map((book, i) => (
+                                            <View key={i} style={styles.resultItem}>
+                                                <KSearchResult book={book} onPress={() => searchBook(book)} />
+                                            </View>
+                                        ))
+                                }
+                            </ScrollView>
+                            {results.data && results.data[0] && <KBookSuggestionView book={results.data[0]} onSuggestionSelect={searchBook} />}
                         </View>
+                        {/* {results.info && <View>
+                            <Text>Time: {results.info.time}s</Text>
+                            <Text>length: {results.info.length}</Text>
+                            <Text>Page: {results.info.page}</Text>
+                            <Text>Pages: {(results.info.length / results.info.limit).toFixed()}</Text>
+                        </View>} */}
                         {results.info && <View style={{ width: '100%', alignItems: 'center' }}>
                             <KPaginator
                                 current={results.info.page}
@@ -131,6 +136,57 @@ export default function Search() {
                     </ScrollView>
                 </View>}
             </View>
+            {/* <SafeAreaProvider>
+            <View style={styles.container}>
+                { <KBackground /> }
+                {results?.data
+                    ? <StatusBar style="dark" />
+                    : <StatusBar style="light" />
+                }
+                <View style={styles.searchContainer}>
+                    <View style={{ alignContent: 'center', justifyContent: 'center' }}>
+                        <SafeAreaView style={styles.searchZone}>
+                            <KTextInput value={term} onChangeText={setTerm} onSubmitEditing={() => searchStr(term)} />
+                            <KButton title={Strings.search} onPress={() => searchStr(term)} />
+                            { <KIconButton name="settings" onPress={() => { }} /> }
+                        </SafeAreaView>
+                    </View>
+                    {results && <View style={styles.resultZone}>
+                        {
+                            results.tokens &&
+                            <View style={styles.resultInfo}>
+                                <View style={styles.resultTokens}>
+                                    {results.data && <Text>{results.data!.length} Results</Text>}
+                                    <Text>for :</Text>
+                                    {Object.keys(results.tokens).map((token, i) => (
+                                        <Text key={i}>{token}</Text>
+                                    ))}
+                                </View>
+                            </View>
+                        }
+                        {results?.data && <View style={styles.sugContainer}>
+                            <KAuthorSuggestionView term={term} />
+                        </View>}
+                        {isLoadingComplete === false && <ActivityIndicator style={{ flex: 1 }} size="large" color="#fff" />}
+                        {isLoadingComplete === true && results !== null && (
+                            <ScrollView style={styles.resultList} showsVerticalScrollIndicator={false}>
+                                {
+                                    (results.message !== undefined)
+                                        ? <View style={styles.resultMessage}>
+                                            <Text>{results.message}</Text>
+                                        </View>
+                                        : (results.data ?? []).map((book, i) => (
+                                            <View key={i} style={styles.resultItem}>
+                                                <KSearchResult book={book} />
+                                            </View>
+                                        ))
+                                }
+                            </ScrollView>
+                        )}
+                    </View>}
+                </View>
+            </View>
+        </SafeAreaProvider> */}
         </SafeAreaProvider>
     );
 }

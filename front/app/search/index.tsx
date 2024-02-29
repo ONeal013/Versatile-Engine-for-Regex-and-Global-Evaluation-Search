@@ -41,13 +41,13 @@ export default function Search() {
         typos.forEach(([subTerm, token]) => {
             const index = _term.indexOf(subTerm)
             const length = subTerm.length;
-            correctedText.push(<Text>{_term.slice(0, index)}</Text>);
-            correctedText.push(<Text style={{ fontWeight: 'bold' }}>{token}</Text>);
+            correctedText.push(<Text key={index}>{_term.slice(0, index)}</Text>);
+            correctedText.push(<Text key={index + 1} style={{ fontWeight: 'bold' }}>{token}</Text>);
             _term = _term.slice(index + length);
         });
     } else {
         console.log('No typos found');
-        correctedText.push(<Text>{searchedTerm}</Text>);
+        correctedText.push(<Text key={0}>{searchedTerm}</Text>);
     }
 
     return (
@@ -66,7 +66,7 @@ export default function Search() {
                         <KIconButton link={`/search/authors?q=${term}`}>
                             <Ionicons name="person-outline" size={Physics.icon.medium} color={Colors.light.primaryDark} />
                         </KIconButton>
-                        <KIconButton link={`/search/subjects?q=${term}`}>
+                        <KIconButton link={`/search/advanced?q=${term}`}>
                             <Ionicons name="code-slash" size={Physics.icon.medium} color={Colors.light.primaryDark} />
                         </KIconButton>
                     </SafeAreaView>
