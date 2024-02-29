@@ -6,6 +6,7 @@ import Strings from '../constants/strings';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { Link } from 'expo-router';
 import KAuthorTile from './AuthorTile';
+import IconButton from './IconButton';
 
 interface Props {
     book: Book;
@@ -21,9 +22,14 @@ export default function KSearchResult(props: Props) {
                 {/* <Ionicons name="book" size={Physics.icon.large} color={Colors.light.primaryDark} /> */}
             </View>
             <View style={styles.container}>
-                <Pressable onPress={props.onPress}>
-                    <Text style={styles.title}>{book.title}</Text>
-                </Pressable>
+                <View style={{ flexDirection: 'row' }}>
+                    <Pressable style={{ flex: 1 }} onPress={props.onPress}>
+                        <Text style={styles.title}>{book.title}</Text>
+                    </Pressable>
+                    <IconButton link={{ pathname: `/read/${book._id}`, params: { url: book.formats['application/epub+zip'] } }}>
+                        <Ionicons name="eye" size={Physics.icon.medium} color={Colors.light.secondary} />
+                    </IconButton>
+                </View>
                 {/* <View style={{ flexDirection: 'row', flexWrap: 'wrap' }}>
                     <Text>{Strings.authors}: </Text>
                     <View style={styles.subtitleContainer}>

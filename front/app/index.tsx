@@ -1,7 +1,7 @@
 import { StatusBar } from 'expo-status-bar';
 import { StyleSheet, View, Text, Pressable } from 'react-native';
 import * as NavigationBar from 'expo-navigation-bar';
-import KBackground from '../src/components/background';
+// import KBackground from '../src/components/background';
 import Physics from '../src/constants/physics';
 import React from 'react';
 import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
@@ -16,7 +16,7 @@ export default function App() {
     <SafeAreaProvider>
       <View style={styles.container}>
         <StatusBar style="light" />
-        <KBackground />
+        {/* <KBackground /> */}
         <SafeAreaView style={styles.searchZone}>
           <Link href="/search" asChild>
             <Pressable style={styles.container}>
