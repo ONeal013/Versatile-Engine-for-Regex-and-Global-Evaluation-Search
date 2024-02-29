@@ -221,6 +221,7 @@ router.get('/advanced-search', async (req, res) => {
         const searchPattern = new RegExp(regex, 'i');
         const contents = await Content.find({ content: { $regex: searchPattern } });
         const data = await Book.find({ '_id': { $in: contents.map(item => item.book) } })
+            .sort({ page_rank_score: -1 })
             .lean()
             .skip(skip)
             .limit(limit)
