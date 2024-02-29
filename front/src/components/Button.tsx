@@ -5,18 +5,20 @@ import Physics from '../constants/physics';
 
 interface Props {
   title: string;
+  gradient?: string[];
   onPress?: () => void;
 }
 
 export default function KButton(props: Props) {
+  const colors = props.gradient ?? [Colors.light.secondary, Colors.light.secondaryDark];
   return (
     <Pressable onPress={props.onPress}>
       <LinearGradient
         start={{ x: 0, y: 1 }}
         end={{ x: 1, y: 0 }}
-        colors={[Colors.light.secondary, Colors.light.secondaryDark]}
+        colors={colors}
         style={styles.background}>
-        <Text style={styles.text}>{props.title}</Text>
+        <Text style={{ ...styles.text, ...(props.gradient ? { color: '#000' } : {}) }}>{props.title}</Text>
       </LinearGradient>
     </Pressable >
   );

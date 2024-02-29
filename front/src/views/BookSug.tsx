@@ -80,6 +80,7 @@ const styles = StyleSheet.create({
         borderRadius: Physics.borderRadius.medium,
         overflow: 'hidden',
         marginRight: Physics.gap.medium,
+        marginBottom: Physics.gap.medium,
         gap: Physics.gap.medium,
     },
     container: {

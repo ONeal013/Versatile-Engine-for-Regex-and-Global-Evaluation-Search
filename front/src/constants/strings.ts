@@ -5,6 +5,7 @@ const Strings = {
   apiBooks: apiBaseUrl + "books/",
   apiSearch: apiBaseUrl + "books/search",
   apiAuthors: apiBaseUrl + "authors/",
+  apiAuthorSearch: apiBaseUrl + "authors/search/",
   apiAuthorSug: apiBaseUrl + "authors/similar/",
   apiSugBook: apiBaseUrl + "suggestions/",
   apiBookCover_: (id: number, size: "small" | "medium" = "medium") =>

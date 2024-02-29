@@ -1,29 +1,31 @@
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 import Colors from '../constants/colors';
 import Physics from '../constants/physics';
-import Ionicons from '@expo/vector-icons/Ionicons';
+import { Link } from 'expo-router';
 
 interface Props {
-  icon: string;
-  onPress?: () => void;
+  children: React.ReactNode;
+  selected?: boolean;
+  link: string;
 }
 
 export default function KIconButton(props: Props) {
   return (
-    // <Pressable style={styles.background} onPress={props.onPress}>
-    //   <Ionicons name="settings" size={Physics.icon.medium} color={Colors.light.primaryDark} />
-    // </Pressable >
-    <View>
-    </View>
+    <Link href={props.link} asChild>
+      <View style={{ ...styles.background, ...(props.selected ? { backgroundColor: Colors.light.primaryDark } : {}) }}>
+        {props.children}
+      </View>
+    </Link>
   );
 }
 
 const styles = StyleSheet.create({
   background: {
-    paddingVertical: Physics.padding.medium,
-    paddingHorizontal: Physics.padding.large,
+    paddingVertical: Physics.padding.small,
+    paddingHorizontal: Physics.padding.medium,
     borderRadius: Physics.borderRadius.medium,
     ...Physics.shadow,
     elevation: Physics.elevation.medium,
+    backgroundColor: '#fff'
   },
 });

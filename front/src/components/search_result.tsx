@@ -5,6 +5,7 @@ import { Book } from '../models/book';
 import Strings from '../constants/strings';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { Link } from 'expo-router';
+import KAuthorTile from './AuthorTile';
 
 interface Props {
     book: Book;
@@ -43,7 +44,8 @@ export default function KSearchResult(props: Props) {
                 <ScrollView horizontal={true}>
                     {book.authors && book.authors.map((author, i) => (
                         <View key={i} style={styles.authorWrapper}>
-                            <View style={styles.authorLeading}>
+                            <KAuthorTile author={author} />
+                            {/* <View style={styles.authorLeading}>
                                 <Ionicons name="person" size={Physics.icon.medium} color={Colors.light.primaryDark} />
                             </View>
                             <View style={styles.container}>
@@ -55,7 +57,7 @@ export default function KSearchResult(props: Props) {
                                     {author.birth_year && <Text>-</Text>}
                                     <Text>{author.death_year}</Text>
                                 </View>}
-                            </View>
+                            </View> */}
                         </View >
                     ))}
                 </ScrollView>
@@ -66,12 +68,6 @@ export default function KSearchResult(props: Props) {
 
 const styles = StyleSheet.create({
     authorWrapper: {
-        flexDirection: 'row',
-        gap: Physics.gap.small,
-        padding: Physics.padding.small,
-        borderRadius: Physics.borderRadius.medium,
-        borderWidth: Physics.borderWidth.small,
-        borderColor: Colors.light.background,
         marginRight: Physics.gap.medium,
     },
     authorLeading: {

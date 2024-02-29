@@ -4,6 +4,7 @@ import Physics from '../constants/physics';
 import Strings from '../constants/strings';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { Author } from '../models/author';
+import { Link } from 'expo-router';
 
 interface Props {
     author: Author;
@@ -13,14 +14,14 @@ interface Props {
 export default function KAuthorSuggestion(props: Props) {
     const author = props.author;
     return (
-        <Pressable style={styles.wrapper} onPress={props.onPress}>
+        <View style={styles.wrapper}>
             <View style={styles.leading}>
                 <Ionicons name="person" size={Physics.icon.large} color={Colors.light.primaryDark} />
             </View>
             <View style={styles.container}>
-                <View>
+                <Link href={`/search/authors?q=${author.name}`} >
                     <Text numberOfLines={2} style={styles.title}>{author.name}</Text>
-                </View>
+                </Link>
                 {(author.birth_year || author.death_year) && <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: Physics.gap.small }}>
                     <Text>{author.birth_year}</Text>
                     {author.birth_year && <Text>-</Text>}
@@ -38,7 +39,7 @@ export default function KAuthorSuggestion(props: Props) {
                         <Text>{author.death_year}</Text>
                     </View>
                 </View> */}
-        </Pressable >
+        </View>
     );
 }
 

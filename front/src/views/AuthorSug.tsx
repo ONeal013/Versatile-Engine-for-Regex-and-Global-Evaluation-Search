@@ -1,4 +1,4 @@
-import { StyleSheet, View, ScrollView } from 'react-native';
+import { StyleSheet, View, ScrollView, ActivityIndicator } from 'react-native';
 import Colors from '../constants/colors';
 import Physics from '../constants/physics';
 import { useAuthorSuggestion } from '../hooks/suggestions/author';
@@ -14,6 +14,11 @@ export default function KAuthorSuggestionView(props: Props) {
 
     return (
         <View style={styles.container}>
+            {isSuggestionComplete === false &&
+                <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', padding: Physics.padding.large }}>
+                    <ActivityIndicator style={{ flex: 1 }} size="large" color={Colors.light.secondary} />
+                </View>
+            }
             <ScrollView style={styles.scroller} horizontal={true} showsHorizontalScrollIndicator={false}>
                 {suggestions && suggestions.map((author, index) => {
                     return (

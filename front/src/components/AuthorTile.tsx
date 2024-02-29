@@ -3,6 +3,7 @@ import Colors from '../constants/colors';
 import Physics from '../constants/physics';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { Author } from '../models/author';
+import { Link } from 'expo-router';
 
 interface Props {
     author: Author;
@@ -12,21 +13,23 @@ interface Props {
 export default function KAuthorTile(props: Props) {
     const author = props.author;
     return (
-        <View style={styles.authorWrapper}>
-            <View style={styles.authorLeading}>
-                <Ionicons name="person" size={Physics.icon.medium} color={Colors.light.primaryDark} />
-            </View>
-            <View style={styles.container}>
-                <View>
-                    <Text numberOfLines={2} style={styles.authorTitle}>{author.name}</Text>
+        <Link href={`/search/authors?q=${author.name}`}>
+            <View style={styles.authorWrapper}>
+                <View style={styles.authorLeading}>
+                    <Ionicons name="person" size={Physics.icon.medium} color={Colors.light.primaryDark} />
                 </View>
-                {(author.birth_year || author.death_year) && <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: Physics.gap.small }}>
-                    <Text>{author.birth_year}</Text>
-                    {author.birth_year && <Text>-</Text>}
-                    <Text>{author.death_year}</Text>
-                </View>}
+                <View style={styles.container}>
+                    <View>
+                        <Text numberOfLines={2} style={styles.authorTitle}>{author.name}</Text>
+                    </View>
+                    {(author.birth_year || author.death_year) && <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: Physics.gap.small }}>
+                        <Text>{author.birth_year}</Text>
+                        {author.birth_year && <Text>-</Text>}
+                        <Text>{author.death_year}</Text>
+                    </View>}
+                </View>
             </View>
-        </View >
+        </Link>
     );
 }
 
