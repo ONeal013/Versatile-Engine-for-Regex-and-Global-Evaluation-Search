@@ -70,105 +70,117 @@ const correctQueries = async (queries) => {
 
 
 
-    router.get('/search', async (req, res) => {
-        const startTime = new Date();
-    
-        let query = req.query.q;
-        const page = parseInt(req.query.page) || 1; // Défaut à la page 1 si non spécifié
-        const limit = parseInt(req.query.limit) || 15; // Défaut à 10 éléments par page
-        const skip = (page - 1) * limit;
-    
-        if (!query) {
-            return res.status(400).send({ error: 'Query parameter is missing' });
-        }
-    
-        const queries = tokenize(query.toLowerCase());
-        let result = {
-            info: {time: 0, length: 0, page, limit}, // Enregistrez les infos de pagination
-            typos: {},
-            tokens: {},
-            data: [],
-        };
-    
-        const data = new Set();
-        const weights = {};
-    
-        const exactMatchBook = await Book.findOne({ title: query });
-        if (exactMatchBook) {
-            data.add(exactMatchBook._id);
-            weights[exactMatchBook._id] = 100000;
-        }
-    
-        try {
-            for (const singleQuery of Object.keys(queries)) {
-                console.log(singleQuery);
-                 
-                const tokenWeight = 1 / (Object.keys(queries).indexOf(singleQuery) + 1);
-                
-                const reverseIndexEntries = await ReverseIndex.aggregate([
-                    {
-                        $search: {
-                            text: {
-                                query: singleQuery,
-                                path: "token",
-                                fuzzy: {            
-                                    maxEdits: 2,
-                                    prefixLength: 1
-                                }
-                            }
-                        },
-                    },
-                    { $limit: 1 }
-                ]);
-    
-                for (const entry of reverseIndexEntries) {
-                    const books = entry.books;
-                    const bookIds = Object.keys(books);
-    
-                    // Gestion des typos
-                    if (singleQuery !== entry.token) {
-                        result.typos[singleQuery] = entry.token; // Enregistrez la correction
-                    }
-    
-                    Object.entries(books).forEach(([bookId, occurrence]) => {
-                        if (!weights[bookId]) {
-                            weights[bookId] = 0;
-                        }
-                        weights[bookId] += occurrence * tokenWeight;
-                    });
-    
-                    result.tokens[entry.token] = entry.books;
-                    console.log(data);
-                    bookIds.forEach(id => data.add(id));
+router.get('/search', async (req, res) => {
+    const startTime = new Date();
+
+    let query = req.query.q;
+    const page = parseInt(req.query.page) || 1; // Défaut à la page 1 si non spécifié
+    const limit = parseInt(req.query.limit) || 10; // Défaut à 10 éléments par page
+    const skip = (page - 1) * limit;
+
+    if (!query) {
+        return res.status(400).send({ error: 'Query parameter is missing' });
+    }
+
+    const queries = tokenize(query.toLowerCase());
+    let result = {
+        info: { time: 0, length: 0, page, limit }, // Enregistrez les infos de pagination
+        typos: {},
+        tokens: {},
+        data: [],
+    };
+
+    const data = new Set();
+    const weights = {};
+
+    const exactMatchBook = await Book.aggregate([
+        {
+            $search: {
+                text: {
+                    query: query,
+                    path: "title",
+                    fuzzy: {},
                 }
-            }
-    
-            const books = await Book.find({ '_id': { $in: Array.from(data) } })
-                                    .sort({ page_rank_score: -1 })
-                                    .populate('authors')
-                                    .populate('translators')
-                                    .lean()
-                                    .skip(skip)
-                                    .limit(limit) // Appliquez pagination
-                                    .exec();
-    
-            books.sort((a, b) => {
-                const weightA = weights[a._id.toString()] || 0;
-                const weightB = weights[b._id.toString()] || 0;
-                return (b.page_rank_score * weightB) - (a.page_rank_score * weightA);
-            });
-    
-            result.data = books;
-            result.info.length = books.length;
-    
-            const endTime = new Date();
-            result.info.time = (endTime - startTime) / 1000;
-    
-            res.json(result);
-        } catch (error) {
-            res.status(500).send({ error: error.message });
-        }
+            },
+        },
+        { $limit: 1 }
+    ]);
+    console.log(exactMatchBook.length, 'Exact match found');
+    exactMatchBook.forEach((book) => {
+        data.add(book._id.toString());
+        weights[book._id.toString()] = 10000;
     });
+
+    try {
+        for (const singleQuery of Object.keys(queries)) {
+            console.log(singleQuery);
+
+            const tokenWeight = 1 / (Object.keys(queries).indexOf(singleQuery) + 1);
+
+            const reverseIndexEntries = await ReverseIndex.aggregate([
+                {
+                    $search: {
+                        text: {
+                            query: singleQuery,
+                            path: "token",
+                            fuzzy: {
+                                maxEdits: 2,
+                                prefixLength: 1
+                            }
+                        }
+                    },
+                },
+                { $limit: 1 }
+            ]);
+
+            for (const entry of reverseIndexEntries) {
+                const books = entry.books;
+                const bookIds = Object.keys(books);
+
+                // Gestion des typos
+                if (singleQuery !== entry.token) {
+                    result.typos[singleQuery] = entry.token; // Enregistrez la correction
+                }
+
+                Object.entries(books).forEach(([bookId, occurrence]) => {
+                    if (!weights[bookId]) {
+                        weights[bookId] = 0;
+                    }
+                    weights[bookId] += occurrence * tokenWeight;
+                });
+
+                result.tokens[entry.token] = entry.books;
+                // console.log(data);
+                bookIds.forEach(id => data.add(id));
+            }
+        }
+
+        const books = await Book.find({ '_id': { $in: Array.from(data) } })
+            // .sort({ page_rank_score: -1 })
+            .populate('authors')
+            .populate('translators')
+            .lean()
+            .skip(skip)
+            .limit(limit) // Appliquez pagination
+            .exec();
+
+        books.sort((a, b) => {
+            const weightA = weights[a._id.toString()] || 0;
+            const weightB = weights[b._id.toString()] || 0;
+            return (b.page_rank_score * weightB) - (a.page_rank_score * weightA);
+        });
+
+        result.data = books;
+        result.info.length = data.size;
+
+        const endTime = new Date();
+        result.info.time = (endTime - startTime) / 1000;
+
+        res.json(result);
+    } catch (error) {
+        res.status(500).send({ error: error.message });
+    }
+});
 
 
 

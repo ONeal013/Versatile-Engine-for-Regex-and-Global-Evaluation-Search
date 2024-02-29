@@ -15,6 +15,7 @@ import KAuthorSuggestionView from '../../src/views/AuthorSug';
 import KBookSuggestionView from '../../src/views/BookSug';
 import { useLocalSearchParams } from 'expo-router';
 import { Book } from '../../src/models/book';
+import KPaginator from '../../src/components/paginator';
 
 
 export default function Search() {
@@ -24,7 +25,7 @@ export default function Search() {
 
     // hooks
     const [term, setTerm] = React.useState<string>(params.q ?? '');
-    const [isLoadingComplete, results, searchStr] = useSearch();
+    const [isLoadingComplete, results, searchedTerm, searchStr] = useSearch();
 
     const searchBook = (book: Book) => {
         setTerm(book.title);
@@ -32,15 +33,19 @@ export default function Search() {
     }
 
     const correctedText: Array<React.JSX.Element> = [];
-    if (results?.typos) {
-        let _term = term.toLocaleLowerCase();
-        Object.entries(results.typos).forEach(([subTerm, token]) => {
+    const typos = Object.entries(results?.typos ?? {});
+    if (typos.length > 0) {
+        let _term = (searchedTerm ?? '').toLocaleLowerCase();
+        typos.forEach(([subTerm, token]) => {
             const index = _term.indexOf(subTerm)
             const length = subTerm.length;
             correctedText.push(<Text>{_term.slice(0, index)}</Text>);
             correctedText.push(<Text style={{ fontWeight: 'bold' }}>{token}</Text>);
             _term = _term.slice(index + length);
         });
+    } else {
+        console.log('No typos found');
+        correctedText.push(<Text>{searchedTerm}</Text>);
     }
 
     return (
@@ -59,7 +64,10 @@ export default function Search() {
                         <ActivityIndicator style={{ flex: 1 }} size="large" color={Colors.light.secondaryDark} />
                     </View>
                 }
-                {isLoadingComplete === true && results && <View style={styles.resultZone}>
+                {results?.error && <View style={{ alignItems: 'center', justifyContent: 'center' }}>
+                    <Text>{results.error}</Text>
+                </View>}
+                {results && !results?.error && <View style={styles.resultZone}>
                     <ScrollView>
                         {
                             results.tokens &&
@@ -67,9 +75,15 @@ export default function Search() {
                                 <View style={styles.resultTokens}>
                                     {results.info && <Text style={{ fontWeight: 'bold' }}>{results.info!.length}</Text>}
                                     <Text>results in</Text>
-                                    {results.info && <Text style={{ fontWeight: 'bold' }}>{results.info!.time}s</Text>}
+                                    {results.info && <Text style={{ fontWeight: 'bold' }}>{results.info!.time} second(s)</Text>}
                                     <Text>for :</Text>
                                     {correctedText}
+                                </View>
+                                <View style={styles.resultTokens}>
+                                    <Text>Page:</Text>
+                                    {results.info && <Text style={{ fontWeight: 'bold' }}>{results.info!.page}</Text>}
+                                    <Text>of</Text>
+                                    {results.info && <Text style={{ fontWeight: 'bold' }}>{Math.ceil(results.info!.length / results.info!.limit)}</Text>}
                                 </View>
                             </View>
                         }
@@ -92,12 +106,20 @@ export default function Search() {
                             </ScrollView>
                             {results.data && results.data[0] && <KBookSuggestionView book={results.data[0]} onSuggestionSelect={searchBook} />}
                         </View>
-                        {results.info && <View>
+                        {/* {results.info && <View>
                             <Text>Time: {results.info.time}s</Text>
-                            <Text>Results: {results.info.length}</Text>
+                            <Text>length: {results.info.length}</Text>
                             <Text>Page: {results.info.page}</Text>
-                            <Text>Pages: {results.info.length / results.info.limit}</Text>
-                            <Text>Pages: {(results.info.length / results.info.limit).toFixed() + 1}</Text>
+                            <Text>Pages: {(results.info.length / results.info.limit).toFixed()}</Text>
+                        </View>} */}
+                        {results.info && <View style={{ width: '100%', alignItems: 'center' }}>
+                            <KPaginator
+                                current={results.info.page}
+                                total={results.info.length}
+                                limit={results.info.limit}
+                                neighbours={3}
+                                onPageChange={(page) => searchStr(term, page)}
+                            />
                         </View>}
                     </ScrollView>
                 </View>}

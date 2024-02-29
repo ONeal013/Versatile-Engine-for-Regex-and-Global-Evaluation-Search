@@ -24,15 +24,19 @@ type SearchResults = {
 
 export function useSearch() {
   const [results, setResults] = React.useState<SearchResults | null>(null);
+  const [searchedTerm, setSearchedTerm] = React.useState<String | null>(null);
   const [isSearchComplete, setSearchComplete] = React.useState<Boolean | null>(
     null
   );
 
-  const searchStr = async (term: String) => {
+  const searchStr = async (term: String, page: number = 1) => {
+    // set searched term
+    setSearchedTerm(term);
+    // set search complete to false
     setSearchComplete(false);
     // fetch data from api
     try {
-      const url = Strings.apiSearch + "?q=" + term;
+      const url = Strings.apiSearch + "?q=" + term + "&page=" + page;
       // const url = Strings.apiBooks;
       console.log("Fetching data from: ", url);
       const response = await fetch(url, {
@@ -55,5 +59,5 @@ export function useSearch() {
     }
   };
 
-  return [isSearchComplete, results, searchStr] as const;
+  return [isSearchComplete, results, searchedTerm, searchStr] as const;
 }
