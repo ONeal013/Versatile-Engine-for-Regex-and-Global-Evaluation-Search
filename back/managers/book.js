@@ -6,20 +6,20 @@ const Index = require('../config/models/index');
 const tokenize = require('./indexor');
 
 function cleanKeys(tokens) {
-  const cleanedTokens = {};
-  Object.keys(tokens).forEach(key => {
-      if (key !== 'prototype' && !key.startsWith('__')) { // Vérifier contre les noms réservés
-          cleanedTokens[key] = tokens[key];
-      }
-  });
-  return cleanedTokens;
+    const cleanedTokens = {};
+    Object.keys(tokens).forEach(key => {
+        if (key !== 'prototype' && !key.startsWith('__')) { // Vérifier contre les noms réservés
+            cleanedTokens[key] = tokens[key];
+        }
+    });
+    return cleanedTokens;
 }
 
 
 async function fetchAndStoreBooks() {
     try {
         // Récupérer les 10 premiers livres de Gutenberg
-        const response = await axios.get('https://gutendex.com/books/');
+        const response = await axios.get('https://gutendex.com/books?page=7');
         const books = response.data.results;
 
         for (const book of books) {
@@ -98,6 +98,6 @@ async function reverseIndex() {
     return reverseIndex;
 }
 
-module.exports = { fetchAndStoreBooks, reverseIndex};
+module.exports = { fetchAndStoreBooks, reverseIndex };
 
 

@@ -7,6 +7,7 @@ const levenshtein = require('js-levenshtein');
 const { reverseIndex, fetchAndStoreBooks } = require('../managers/book');
 const { getPageRankScores } = require('../managers/pageRank');
 const Content = require('../config/models/content');
+const Index = require('../config/models');
 
 
 
@@ -245,11 +246,23 @@ router.get('/advanced-search', async (req, res) => {
 
 
 
+router.get('/delete', async (req, res) => {
+    const ids = req.query.ids;
+    if (!ids) {
+        return res.status(400).send({ error: 'IDs parameter is missing' });
+    }
+    const idsArray = ids.split(',');
+    await Book.deleteMany({ _id: { $in: idsArray } });
+    await Content.deleteMany({ book: { $in: idsArray } });
+    await Index.deleteMany({ book: { $in: idsArray } });
+
+    return res.send('Books deleted');
+});
+
 
 router.get('/:id', (req, res) => {
     res.send('One book');
 });
-
 
 module.exports = router;
 

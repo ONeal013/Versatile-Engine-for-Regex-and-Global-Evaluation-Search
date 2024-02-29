@@ -46,7 +46,6 @@ export default function KBookSuggestionView(props: Props) {
 const styles = StyleSheet.create({
     wrapper: {
         width: '100%',
-        maxWidth: 450,
         height: 'auto',
         flexDirection: 'column',
         // justifyContent: 'center',

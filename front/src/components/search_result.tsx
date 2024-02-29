@@ -37,7 +37,7 @@ export default function KSearchResult(props: Props) {
                 </View> */}
                 <View style={styles.bottomContainer}>
                     <Text>Subjects: </Text>
-                    <Text style={{ ...styles.subtitle, maxWidth: '85%' }} numberOfLines={1}>
+                    <Text style={{ ...styles.subtitle, maxWidth: 550 }} numberOfLines={1}>
                         {book.subjects.slice(0, 2).map((subject, i) => subject)}
                     </Text>
                 </View>
