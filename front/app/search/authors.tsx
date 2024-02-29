@@ -4,21 +4,17 @@ import * as NavigationBar from 'expo-navigation-bar';
 import KTextInput from '../../src/components/TextInput';
 import KButton from '../../src/components/Button';
 import Physics from '../../src/constants/physics';
-import React, { useEffect } from 'react';
-import KSearchResult from '../../src/components/search_result';
+import React from 'react';
 import { useSearch } from '../../src/hooks/search/author';
 import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 import Strings from '../../src/constants/strings';
 import { ActivityIndicator } from 'react-native';
 import Colors from '../../src/constants/colors';
-import KAuthorSuggestionView from '../../src/views/AuthorSug';
-import KBookSuggestionView from '../../src/views/BookSug';
+import KAuthorBookView from '../../src/views/AuthorBooks';
 import { useLocalSearchParams } from 'expo-router';
-import { Book } from '../../src/models/book';
 import KPaginator from '../../src/components/paginator';
 import KIconButton from '../../src/components/IconButton';
 import { Ionicons } from '@expo/vector-icons';
-import KAuthorTile from '../../src/components/AuthorTile';
 import { Author } from '../../src/models/author';
 import KAuthorSuggestion from '../../src/components/AuthorSug';
 
@@ -102,9 +98,6 @@ export default function Search() {
                                 </View>
                             </View>
                         }
-                        {/* {results?.data && results.data[0] && <View style={styles.sugContainer}>
-                            <KAuthorSuggestionView book={results.data[0]} />
-                        </View>} */}
                         <View style={{ flexDirection: 'row', flexWrap: 'wrap', ...styles.resultList }}>
                             {
                                 (results.message !== undefined)
@@ -119,6 +112,10 @@ export default function Search() {
                             }
                             {/* {results.data && results.data[0] && <KBookSuggestionView book={results.data[0]} onSuggestionSelect={searchAuthor} />} */}
                         </View>
+
+                        {results?.data && results.data[0] && <View style={styles.sugContainer}>
+                            <KAuthorBookView author={results.data[0]} />
+                        </View>}
                         {results.info && <View style={{ width: '100%', alignItems: 'center' }}>
                             <KPaginator
                                 current={results.info.page}
