@@ -23,9 +23,9 @@ export default function KAuthorTile(props: Props) {
                         <Text numberOfLines={2} style={styles.authorTitle}>{author.name}</Text>
                     </View>
                     {(author.birth_year || author.death_year) && <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: Physics.gap.small }}>
-                        <Text>{author.birth_year}</Text>
+                        <Text style={styles.normal}>{author.birth_year}</Text>
                         {author.birth_year && <Text>-</Text>}
-                        <Text>{author.death_year}</Text>
+                        <Text style={styles.normal}>{author.death_year}</Text>
                     </View>}
                 </View>
             </View>
@@ -53,6 +53,9 @@ const styles = StyleSheet.create({
     },
     authorTitle: {
         fontWeight: 'bold',
+    },
+    normal: {
+        fontWeight: 'normal',
     },
     container: {
         flex: 1,

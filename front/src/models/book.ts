@@ -10,4 +10,7 @@ export interface Book {
   subjects: string[];
   bookshelves: string[];
   languages: string[];
+  formats: {
+    [key: string]: string;
+  };
 }

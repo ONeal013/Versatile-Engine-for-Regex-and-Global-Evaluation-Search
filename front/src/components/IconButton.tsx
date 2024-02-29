@@ -2,11 +2,12 @@ import { StyleSheet, View } from 'react-native';
 import Colors from '../constants/colors';
 import Physics from '../constants/physics';
 import { Link } from 'expo-router';
+import { Href } from 'expo-router/build/link/href';
 
 interface Props {
   children: React.ReactNode;
   selected?: boolean;
-  link: string;
+  link: Href;
 }
 
 export default function KIconButton(props: Props) {
