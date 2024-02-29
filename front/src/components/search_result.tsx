@@ -24,7 +24,7 @@ export default function KSearchResult(props: Props) {
             <View style={styles.container}>
                 <View style={{ flexDirection: 'row' }}>
                     <Pressable style={{ flex: 1 }} onPress={props.onPress}>
-                        <Text style={styles.title}>{book.title}</Text>
+                        <Text style={{ ...styles.title, maxWidth: 500 }}>{book.title}</Text>
                     </Pressable>
                     <IconButton link={{ pathname: `/read/${book._id}`, params: { url: book.formats['application/epub+zip'] } }}>
                         <Ionicons name="eye" size={Physics.icon.medium} color={Colors.light.secondary} />

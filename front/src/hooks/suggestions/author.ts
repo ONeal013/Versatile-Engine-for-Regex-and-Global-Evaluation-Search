@@ -29,7 +29,7 @@ export function useAuthorSuggestion(book: Book | undefined) {
       console.log(results);
       console.log(results.length, " suggestions found");
       setSuggestionComplete(true);
-      setSuggestions(results);
+      setSuggestions(results ?? []);
     } catch (error) {
       console.error("Error fetching data: ", error);
       setSuggestionComplete(true);
