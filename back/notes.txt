@@ -1,0 +1,45 @@
+# The Versatile Engine for Regex and Global Evaluation Search
+
+lancer dans cet ordre
+
+1. fetch
+2. reverse
+3. suggestion
+4. ranked 
+
+
+# https://cloud.mongodb.com/v2/65ca3c8254533720612e2ffd#/metrics/replicaSet/65ca3cc456131b58b05ce2c8/explorer/test/bookcontents/find
+
+#Test Fetch
+# http://localhost:3000/book/fetch
+
+#Test Search
+# http://localhost:3000/books/search?q=twins
+
+# test Regex 
+http://localhost:3000/books/advanced-search/regex=
+
+#Test suggestion avec id 
+# http://localhost:3000/suggestions/65dcaf4001d3f94faad92d38
+
+
+#Test suggestion poir tous les livres 
+# http://localhost:3000/suggestions
+
+# github
+https://github.com/ONeal013/The-Verges
+
+# Fonction de classement 
+http://localhost:3000/suggestions/ranked
+
+
+# recherche d'auteur 
+http://localhost:3000/authors/author-search?q=Louisa%20May
+
+
+# recherche de livre par auteur
+http://localhost:3000/authors/books-by-author?name=Stoker,%20Bram
+
+
+#OBSOLETE : 24/02/2024 Test suggestion 1 : cacluler les scores de jaccard et les mettre dans la mongodb
+#C:\Users\anil0\Desktop\TheVergeProject\back\managers> node calculateJaccardScores.js

@@ -11,6 +11,7 @@ const bookSchema = new mongoose.Schema({
     languages: [String],
     copyright: Boolean,
     media_type: String,
+    page_rank_score: Number,
     formats: {
         type: {
             "text/html": String,
