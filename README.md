@@ -56,9 +56,6 @@ The selected centrality measure is clearly defined, calculated, and demonstrated
 
 Contributions are welcome. Please open an issue or submit a pull request for any suggestions or improvements.
 
-## Authors
-
-This project was developed by Anil HADJELI and Leandre AKAKPO.
 
 ## Screenshots
 
@@ -66,3 +63,8 @@ This project was developed by Anil HADJELI and Leandre AKAKPO.
 [![image.png](https://i.postimg.cc/QMbkcHQM/image.png)](https://postimg.cc/LqJ1p40d)
 [![image.png](https://i.postimg.cc/BQKTMhTk/image.png)](https://postimg.cc/bsqSv9F9)
 [![image.png](https://i.postimg.cc/QMbkcHQM/image.png)](https://postimg.cc/LqJ1p40d)
+
+
+## Authors
+
+This project was developed by Anil HADJELI and Leandre AKAKPO.
